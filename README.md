@@ -12,4 +12,4 @@ No other mods are required.
 | `/services` | Different services. Mainly the different product types.              |
 | `/data`     | All types of data. Example: Config, products, chests, etc.           |
 | `/docs`     | The documentation folder. This folder is not included in production. |
-| `/.github`  | All github related stuff                                             |
+| `/.github`  | All github related stuff. Not included in production                 |
