@@ -37,7 +37,7 @@ local data = {
     end,
     BBX = function(font, line)
         local i=1
-        local b = {"width","height"}
+        local b = {"width","height","offx","offy"}
         font._CUR_CHAR.bound = {}
         for word in string.gmatch(line, '([^ ]+)') do
             if i > #b then return end
