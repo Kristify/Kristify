@@ -1,12 +1,13 @@
 -- make a copy of package.path
 local old_path = package.path
-local sPath = fs.getDir(shell.getRunningProgram())
-local sData = fs.combine(sPath,"data")
+local sSrc = fs.getDir(shell.getRunningProgram())
+local sRoot = fs.combine(sSrc,"..")
+local sData = fs.combine(sRoot,"data")
 local basalt = require("basalt")
 local ctx
 
 package.path = string.format(
-    "/%s/?.lua;/rom/modules/main/?.lua", sPath
+    "/%s/?.lua;/rom/modules/main/?.lua", sSrc
 )
 local function init(...)
     ctx = {gui={},pages={},current=1,scroll=0,redraw=true}
@@ -19,17 +20,8 @@ local function init(...)
         f.close()
     end
 
-    -- load colors
-    local f = fs.open(fs.combine(sData,"color.table"), 'r')
-    local content = f.readAll()
-    f.close()
+    -- load products
 
-    local col = {white=0x1,orange=0x2,magenta=0x4,lightBlue=0x8,yellow=0x10,lime=0x20,pink=0x40,grey=0x80,lightGrey=0x100,cyan=0x200,purple=0x400,blue=0x800,brown=0x1000,green=0x2000,red=0x4000,black=0x8000}
-    local inferiorcol=col; inferiorcol.gray=col.grey; inferiorcol.lightGray=col.lightGrey
-    local b,colors = pcall( load("return "..content,"","t",{colours=col,colors=inferiorcol}) )
-    if type(colors) == "table" and b then
-        ctx.color = colors
-    end
 
     return ctx
 end
@@ -42,7 +34,7 @@ end,function(err)
     printError(err)
 end)
 
--- MAIN
+-- Create basalt index page
 local base = basalt.createFrame()
     :setTheme({
         FrameBG = colors.black,
@@ -53,19 +45,44 @@ local base = basalt.createFrame()
         ListBG = colors.gray,
         ListText = colors.black,
         LabelBG = colors.black,
-        LabelText = colors.white
+        LabelText = colors.white,
+        ScrollbarText = colors.black,
+        ScrollbarBG = colors.gray,
+        ScrollbarSymbolColor = colors.lightGray
     })
     :addLayout(fs.combine(sData,"index.xml"))
 
-local displayPage =base:getDeepObject("main-content")
+---Saves the current proucts states into the file
+---and loads them into the interface.
+local function updateProducts()
+
+end
+
 local sCurPage = ""
+-- MAIN LOOP
 parallel.waitForAny(
     basalt.autoUpdate,
     function()
+        local scrollbar = base:getDeepObject("main-scroll")
+        local menubar = base:getDeepObject("main-menubar")
+        local displayPage = base:getDeepObject("main-content")
+
+        -- Background
+        local bg = ""
+        local updateContent = true
+        local w,h = term.getSize()
+        for y=1,h do
+            bg = bg..('\127'):rep(w-1)..' '
+        end
+        bg = displayPage:addLabel()
+            :setBackground(colors.black)
+            :setForeground(colors.gray)
+            :setText(bg)
+            :setSize(w-1,h-1)
+            :setPosition(1,1)
+
         while true do
-            local scrollbar = base:getDeepObject("main-scroll")
-            local menubar = base:getDeepObject("main-menubar")
-            
+            -- Change pages
             local tmpPage = menubar:getItem(menubar:getItemIndex()).text
             if tmpPage ~= sCurPage then
                 sCurPage = tmpPage
@@ -76,6 +93,14 @@ parallel.waitForAny(
                 displayPage:addLayoutFromString(ctx.pages[sCurPage:lower()..".xml"])
             end
 
+            -- Update products
+            if updateContent then
+                
+                updateContent = false
+            end
+
+            -- Scrolling
+            bg:setPosition(1, scrollbar:getIndex()-1)
             displayPage:setOffset(0, scrollbar:getIndex()-1)
             sleep()
         end

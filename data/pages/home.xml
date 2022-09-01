@@ -1,0 +1,5 @@
+<frame id="=Home">
+    <label y="3" x="parent.w/2-self.w/2" font="2" text="CobbleShop" />
+    <pane x="2" y="5" width="parent.w-2" height="1" bg="lightGray"/>
+    <label x="3" y="7" width="parent.w-4" text="Buy cobblestone as much as you need! Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."/>
+</frame>

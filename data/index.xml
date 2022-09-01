@@ -1,0 +1,8 @@
+<frame>
+    <menubar id="main-menubar" width="parent.w">
+        <item><text>Home</text></item>
+        <item><text>Items</text></item>
+    </menubar>
+    <scrollbar id="main-scroll" x="parent.w" y="2" maxValue="20" symbol="#" height="parent.h-1"/>
+    <frame id="main-content" bg="red" y="2" width="parent.w-1" height="parent.h-1"></frame>>
+</frame>
