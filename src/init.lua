@@ -1,6 +1,8 @@
 -- make a copy of package.path
 local old_path = package.path
 local sPath = fs.getDir(shell.getRunningProgram())
+local sData = fs.combine(sPath,"data")
+local basalt = require("basalt")
 local ctx
 
 package.path = string.format(
@@ -8,39 +10,13 @@ package.path = string.format(
 )
 local function init(...)
     ctx = {gui={},pages={},current=1,scroll=0,redraw=true}
-    local sGui = fs.combine(sPath,"gui")
-    local sData = fs.combine(sPath,"data")
-    local sPages = fs.combine(sData,"pages")
     
-    -- load widgets
-    local widgets = fs.list(sGui)
-    for i=1,#widgets do
-        local _,nX = widgets[i]:find('%.')
-        if nX then widgets[i] = widgets[i]:sub(1,nX-1) end
-
-        local tmp = require(fs.combine(sGui,widgets[i]))
-        ctx.gui[widgets[i]] = {}
-        for k,v in pairs(tmp) do
-            ctx.gui[widgets[i]][k] = v
-        end
-    end
-
     -- load pages
-    local pages = fs.list(sPages)
+    local pages = fs.list(fs.combine(sData,"pages"))
     for i=1,#pages do
-        local f = fs.open(fs.combine(sPages,pages[i]), 'r')
-        local content = f.readAll()
+        local f = fs.open(fs.combine(sData,"pages",pages[i]), 'r')
+        ctx.pages[pages[i]] = f.readAll()
         f.close()
-
-        content = textutils.unserialise(content)
-        if type(content) == "table" then
-            content.length = 0
-            if pages[i] == "index.table" then
-                table.insert(ctx.pages, 1, content)
-            else
-                table.insert(ctx.pages, content)
-            end
-        end
     end
 
     -- load colors
@@ -65,36 +41,47 @@ xpcall(function()
 end,function(err)
     printError(err)
 end)
+
 -- MAIN
-xpcall(function()
-    parallel.waitForAny(
-        function()
-            while true do
-                ctx.gui.render.draw(ctx.pages[1],ctx)
-                sleep()
-            end
-        end,
-        function()
-            while true do
-                local _,h = term.getSize()
-                local event = {os.pullEvent()} -- CHANGE TO pullEventRaw later!!!!!
-                ctx.redraw = true
-                if event[1] == "mouse_scroll" then
-                    if ctx.pages[1].length > h then
-                        ctx.scroll = ctx.scroll-event[2]
-                        if ctx.scroll > 0 then
-                            ctx.scroll = 0
-                        elseif ctx.scroll < -(ctx.pages[1].length) then
-                            ctx.scroll = -(ctx.pages[1].length)
-                        end
-                    end
+local base = basalt.createFrame()
+    :setTheme({
+        FrameBG = colors.black,
+        MenubarBG = colors.cyan,
+        MenubarText = colors.white,
+        SelectionText = colors.white,
+        SelectionBG = colors.black,
+        ListBG = colors.gray,
+        ListText = colors.black,
+        LabelBG = colors.black,
+        LabelText = colors.white
+    })
+    :addLayout(fs.combine(sData,"index.xml"))
+
+local displayPage =base:getDeepObject("main-content")
+local sCurPage = ""
+parallel.waitForAny(
+    basalt.autoUpdate,
+    function()
+        while true do
+            local scrollbar = base:getDeepObject("main-scroll")
+            local menubar = base:getDeepObject("main-menubar")
+            
+            local tmpPage = menubar:getItem(menubar:getItemIndex()).text
+            if tmpPage ~= sCurPage then
+                sCurPage = tmpPage
+                local oldLayout = displayPage:getLastLayout()
+                for _,v in pairs(oldLayout) do
+                    displayPage:removeObject(v)
                 end
+                displayPage:addLayoutFromString(ctx.pages[sCurPage:lower()..".xml"])
             end
+
+            displayPage:setOffset(0, scrollbar:getIndex()-1)
+            sleep()
         end
-    )
-end,function(err)
-    printError(err)
-end)
+    end
+)
+
 
 -- restores package path to original
 package.path = old_path

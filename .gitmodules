@@ -1,0 +1,3 @@
+[submodule "src/Basalt"]
+	path = src/Basalt
+	url = https://github.com/Pyroxenium/Basalt
