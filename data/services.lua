@@ -1,4 +1,4 @@
-local services = {
+return {
 	item = {
 		chests = {
 			{
@@ -11,5 +11,4 @@ local services = {
 			}
 		}
 	}
-};
-return services;
+}

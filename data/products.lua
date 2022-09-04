@@ -1,4 +1,4 @@
-local products = {
+return {
 	{
 		displayName = "Dirt",
 		categorys={"Items"},
@@ -28,5 +28,4 @@ local products = {
 			link = "https://devbin.dev/8f3wy"
 		}
 	}
-};
-return products;
+}

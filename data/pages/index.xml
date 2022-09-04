@@ -1,0 +1,7 @@
+<frame height="parent.h">
+    <menubar id="main-menubar" width="parent.w">
+        <item><text>Home</text></item>
+        <item><text>Products</text></item>
+    </menubar>
+    <frame id="main-content" y="2" width="parent.w" scrollable="true"></frame>>
+</frame>

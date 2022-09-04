@@ -1,4 +1,4 @@
-<frame id="=Items">
+<frame id="=Products">
     <list width="parent.w" height="parent.h" id="items">
     </list>
 </frame>
