@@ -2,9 +2,9 @@ local Object = require("Object")
 local xmlValue = require("utils").getValueFromXML
 
 return function(name)
-    -- Image
+    -- Nfp
     local base = Object(name)
-    local objectType = "Image"
+    local objectType = "Nfp"
     base:setZIndex(2)
     local image
     local shrinkedImage
@@ -133,7 +133,7 @@ return function(name)
 
     local object = {
         init = function(self)
-            self.bgColor = self.parent:getTheme("ImageBG")
+            self.bgColor = self.parent:getTheme("NfpBG")
         end,
         getType = function(self)
             return objectType
@@ -146,6 +146,11 @@ return function(name)
             return self
         end;
 
+        unloadImage = function(self)
+            image = nil
+            self:updateDraw()
+            return self
+        end;
 
         shrink = function(self)
             shrink()
@@ -165,11 +170,11 @@ return function(name)
             if (base.draw(self)) then
                 if (self.parent ~= nil) then
                     if (image ~= nil) then
-                        local obx, oby = self:getAnchorPosition()
-                        local w,h = self:getSize()
+                        local obx, oby = self:getAnchorPosition()                    
                         if (imageGotShrinked) then
                             -- this is copy pasted (and slightly changed) from blittle by Bomb Bloke: http://www.computercraft.info/forums2/index.php?/topic/25354-cc-176-blittle-api/
                             local t, tC, bC = shrinkedImage[1], shrinkedImage[2], shrinkedImage[3]
+                            self:setSize(#t[1],#t)
                             for i = 1, shrinkedImage.height do
                                 local tI = t[i]
                                 if type(tI) == "string" then
@@ -183,6 +188,8 @@ return function(name)
                                 end
                             end
                         else
+                            local w,h = #image[1],#image
+                            self:setSize(w,h)
                             for yPos = 1, math.min(#image, h) do
                                 local line = image[yPos]
                                 for xPos = 1, math.min(#line, w) do

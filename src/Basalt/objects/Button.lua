@@ -9,6 +9,7 @@ return function(name)
     local objectType = "Button"
     local textHorizontalAlign = "center"
     local textVerticalAlign = "center"
+    local metadata = {}
 
     base:setZIndex(5)
     base:setValue("Button")
@@ -18,7 +19,7 @@ return function(name)
     local object = {
         init = function(self)
             self.bgColor = self.parent:getTheme("ButtonBG")
-            self.fgColor = self.parent:getTheme("ButtonText")        
+            self.fgColor = self.parent:getTheme("ButtonText")
         end,
         getType = function(self)
             return objectType
@@ -39,6 +40,15 @@ return function(name)
             base:setValue(text)
             self:updateDraw()
             return self
+        end;
+
+        setMetadata = function(self, newMdata)
+            metadata = newMdata
+            return self
+        end;
+
+        getMetadata = function(self)
+            return metadata
         end;
 
         setValuesByXMLData = function(self, data)
@@ -69,3 +79,4 @@ return function(name)
     }
     return setmetatable(object, base)
 end
+

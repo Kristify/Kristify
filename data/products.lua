@@ -1,6 +1,8 @@
 return {
 	{
 		displayName = "Dirt",
+		description = "Has good quality.",
+		bimg = {{"","   ","888"},{"","888","ccc"},{"","c c"," c "}},
 		categorys={"Items"},
 		type = "item",
 		price = 2,
@@ -11,6 +13,7 @@ return {
 	},
 	{
 		displayName = "Diamond",
+		description = "Only for a limited time!",
 		categorys={"Items","RARE"},
 		type = "item",
 		price = 14,
@@ -21,6 +24,8 @@ return {
 	},
 	{
 		displayName = "MiloX",
+		description = "Get access to a script!",
+		bimg = "script.bimg",
 		categorys={"Files"},
 		type = "link",
 		price = 20,
@@ -29,3 +34,4 @@ return {
 		}
 	}
 }
+
