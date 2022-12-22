@@ -11,7 +11,7 @@ No other mods than ComputerCraft ([Tweaked](https://modrinth.com/mod/cc-tweaked)
 | `/data`    | All types of data. Examples: Config, products, chests, etc.          |
 | `/docs`    | The documentation folder. This folder is not included in production. |
 | `/.github` | All github related stuff. Not included in production                 |
-| `.vscode`  | All VSC related stuff. Not included in production                    |
+| `/.vscode` | All VSCode related stuff. Not included in production                 |
 
 ## Documentation
 
