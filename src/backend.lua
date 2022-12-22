@@ -5,13 +5,13 @@ print("Starting kristify")
 local config = require("/data/config")
 local products = require("/data/products")
 
-if config.pkey == nil then
+if config == nil or config.pkey == nil then
   print("Config not found!")
   return
 end
 
 if utils.endsWith(config.name, ".kst") then
-  print("The krist name in config should not inculdes `.kst`.")
+  print("The krist name in config should not inculde `.kst`.")
   return
 end
 
