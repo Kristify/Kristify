@@ -1,17 +1,22 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
-print("Starting kristify")
+local loggerImport = require("/src/libs/logger")
+local logger = loggerImport:new({ debugging = true })
+
+logger:info("Starting Kristify! Thanks for choosing us.")
+logger:debug("Debugging mode is enabled!")
 
 local config = require("/data/config")
 local products = require("/data/products")
 
 if config == nil or config.pkey == nil then
-  print("Config not found!")
+  logger:error("Config not found! Check documentation for more info.")
   return
 end
 
+-- TODO Make autofix
 if utils.endsWith(config.name, ".kst") then
-  print("The krist name in config should not include `.kst`.")
+  logger:error("The krist name configured contains `.kst`, which it should not.")
   return
 end
 
@@ -19,21 +24,21 @@ local ws = kristly.websocket(config.pkey)
 
 local function startListening()
   ws:subscribe("transactions")
-  print("Subscribed to transactions! :D")
+  logger:info("Subscribed to transactions.")
 
   while true do
     local _, data = os.pullEvent("kristly")
 
     if data.type == "keepalive" then
-      print("Keep alive packet")
+      logger:debug("Keepalive packet")
     elseif data.type == "event" then
-      print("Event: " .. data.event)
+      logger:debug("Event: " .. data.event)
 
       if data.event == "transaction" then
         local transaction = data.transaction
 
         if transaction.sent_name == config.name and transaction.sent_metaname ~= nil then
-          print("Transaction to: " .. transaction.sent_metaname .. "@" .. transaction.sent_name .. ".kst")
+          logger:info("Received transaction to: " .. transaction.sent_metaname .. "@" .. transaction.sent_name .. ".kst")
 
           handleTransaction(transaction)
         elseif transaction.sent_name == config.name then
@@ -43,7 +48,7 @@ local function startListening()
       end
 
     else
-      print("Ignoring packet: " .. data.type)
+      logger:debug("Ignoring packet: " .. data.type)
     end
   end
 end
@@ -71,7 +76,7 @@ function handleTransaction(transaction)
       "message=Here is your change! Thanks for using our shop.")
   end
 
-  print("Dispensing " .. amount .. " item(s).")
+  logger:info("Dispensing " .. amount .. " item(s).")
 end
 
 local function startKristly()
