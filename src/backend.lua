@@ -11,7 +11,7 @@ if config.pkey == nil then
 end
 
 if utils.endsWith(config.name, ".kst") then
-  print("The krist name in config should not inculdes `.kst`.")
+  print("The krist name in config should not include `.kst`.")
   return
 end
 
@@ -51,7 +51,7 @@ end
 function handleTransaction(transaction)
   if not utils.productsIncludes(products, transaction.sent_metaname) then
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      "message=Hey! The item `" .. transaction.sent_metaname .. "` is not avaiable.")
+      "message=Hey! The item `" .. transaction.sent_metaname .. "` is not available.")
     return
   end
 
