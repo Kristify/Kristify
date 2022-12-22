@@ -1,0 +1,3 @@
+{
+  "Lua.diagnostics.disable": ["undefined-field", "deprecated", "lowercase-global"]
+}
