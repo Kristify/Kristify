@@ -1,6 +1,6 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
-local logger = require("/src/libs/logger"):new({ debugging = true })
+local logger = require("/src/logger"):new({ debugging = true })
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -53,13 +53,14 @@ local function startListening()
 end
 
 function handleTransaction(transaction)
-  if not utils.productsIncludes(products, transaction.sent_metaname) then
+  local product = utils.getProduct(products, transaction.sent_metaname)
+
+  if product == false or product == nil then
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
       "message=Hey! The item `" .. transaction.sent_metaname .. "` is not available.")
     return
   end
 
-  local product = utils.getProduct(products, transaction.sent_metaname)
 
   if transaction.value < product.price then
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,

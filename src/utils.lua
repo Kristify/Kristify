@@ -4,16 +4,6 @@ function utils.endsWith(str, ending)
   return ending == "" or str:sub(- #ending) == ending
 end
 
-function utils.productsIncludes(products, metaname)
-  for _, product in ipairs(products) do
-    if product.metaname == metaname then
-      return true
-    end
-  end
-
-  return false
-end
-
 function utils.getProduct(products, metaname)
   for _, product in ipairs(products) do
     if product.metaname == metaname then
