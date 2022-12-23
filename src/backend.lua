@@ -14,9 +14,11 @@ if config == nil or config.pkey == nil then
   return
 end
 
-logger:info("Configuration loaded.")
+logger:info("Configuration loaded. Indexing chests")
 
 local storage = invlib(config.storage)
+storage.refreshStorage(false)
+logger:info("Chests indexed.")
 
 -- TODO Make autofix
 if utils.endsWith(config.name, ".kst") then
@@ -83,6 +85,7 @@ function handleTransaction(transaction)
   logger:debug("Amount: " .. amount .. " Change: " .. change)
 
   local itemsInStock = storage.getCount(product.id)
+  logger:debug("Managed to get stock: " .. itemsInStock)
   if amount > itemsInStock then
     logger:info("Not enogth in stock. Refunding")
     logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
@@ -97,12 +100,30 @@ function handleTransaction(transaction)
       "message=Here is your change! Thanks for using our shop.")
   end
 
-  logger:info("Dispensing " .. amount .. product.id .. " (s).")
+  logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
 
   local turns = math.ceil(amount / 64 / 16)
   local lastTurn = amount - ((turns - 1) * 64 * 16)
 
-  logger:debug("Taking " .. turns .. " turns, last one has " .. lastTurn)
+  logger:debug("Taking " .. turns .. " turn(s), last one has " .. lastTurn)
+
+  for turn = 1, turns do
+    logger:debug("Turn: " .. turn .. ". Turns needed: " .. turns)
+    if turns == turn then
+      logger:debug("Last turn.")
+      logger:debug("Arguments passed: " .. config.self, " | ", product.id, " | ", tostring(lastTurn))
+      storage.pushItems(config.self, product.id, lastTurn, nil, nil, { optimal = false })
+    else
+      logger:debug("Not last turn")
+      storage.pushItems(config.self, product.id, 64 * 16, nil, nil, { optimal = false })
+
+    end
+    for i = 1, 16 do
+      turtle.select(i)
+      turtle.drop()
+    end
+  end
+
 
 end
 

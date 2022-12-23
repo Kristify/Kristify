@@ -3,5 +3,6 @@ return {
   name = "",
   storage = {
     ""
-  }
+  },
+  self = ""
 }
