@@ -1,7 +1,7 @@
 return {
   pkey = "",
   name = "",
-  storge = {
+  storage = {
     ""
   }
 }
