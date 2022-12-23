@@ -2,6 +2,7 @@ local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
 local logger = require("/src/logger"):new({ debugging = true })
 local webhooks = require("/src/webhook")
+local speakerLib = require("/src/speaker")
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -20,9 +21,14 @@ local storage = require("/src/libs/inv")(config.storage)
 storage.refreshStorage()
 logger:info("Chests indexed.")
 
+local speaker = speakerLib:new({
+  config = config
+})
+
 -- TODO Make autofix
 if utils.endsWith(config.name, ".kst") then
   logger:error("The krist name that is configured contains `.kst`, which it should not.")
+  speaker:play("error")
   return
 end
 
@@ -31,6 +37,8 @@ local ws = kristly.websocket(config.pkey)
 local function startListening()
   ws:subscribe("transactions")
   logger:info("Subscribed to transactions.")
+
+  speaker:play("started")
 
   while true do
     local _, data = os.pullEvent("kristly")
@@ -51,6 +59,7 @@ local function startListening()
           logger.info("No metaname found. Refunding.")
           kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
             config.messages.noMetaname)
+          speaker:play("error")
         end
       end
 
@@ -68,6 +77,7 @@ function handleTransaction(transaction)
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
       config.messages.nonexistantItem)
     logger:debug("Item does not exist.")
+    speaker:play("error")
     return
   end
 
@@ -76,6 +86,7 @@ function handleTransaction(transaction)
     logger:info("Not enogth money sent. Refunding.")
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
       config.messages.notEnogthMoney)
+    speaker:play("error")
     return
   end
 
@@ -91,6 +102,7 @@ function handleTransaction(transaction)
     logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
     kristly.makeTransaction(config.pkey, transaction.from, amount * product.price,
       config.messages.notEnogthStock)
+    speaker:play("error")
     return
   end
 
@@ -135,6 +147,8 @@ function handleTransaction(transaction)
       webhooks.googleChat(webhook.URL, message)
     end
   end
+
+  speaker:play("purchase")
 end
 
 local function startKristly()

@@ -18,4 +18,9 @@ return {
       url = ""
     }
   },
+  sounds = {
+    started = "minecraft:block.note_block.harp",
+    purchase = "minecraft:entity.villager.yes",
+    error = "minecraft:block.anvil.land"
+  }
 }
