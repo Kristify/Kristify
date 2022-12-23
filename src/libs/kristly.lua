@@ -1,5 +1,4 @@
-local expect = require "cc.expect"
-local expect, field = expect.expect, expect.field
+local expect = require "cc.expect".expect
 
 local kristly = {}
 local kristlyWS = { ws = nil }
@@ -10,19 +9,20 @@ local kristlyWS = { ws = nil }
 
 --- A basic JSON Post function to the krist api.
 -- Decodes the response from json into a table.
--- @param endpoint The json endpoint. The first part of the url should not be included.
--- @param body A stringified body
--- @return table
+--- @param endpoint string The json endpoint. The first part of the url should not be included.
+--- @param body string A stringified body
+--- @return table result The response from the krist API
 local function basicJSONPOST(endpoint, body)
   expect(1, endpoint, "string")
+  expect(2, body, "string")
 
   return textutils.unserializeJSON(http.post("https://krist.dev/" .. endpoint, body).readAll())
 end
 
---- A basic Get function to the krist api.
+--- A basic GET function to the krist api.
 -- Decodes the response from json into a table.
--- @param endpoint The GET endpoint. Do not include the first part of the url.
--- @return table
+--- @param endpoint string The endpoint to cnnect to. Do not include the first part of the url. (krist.dev)
+--- @return table resykt The response from the krist API
 local function basicGET(endpoint)
   expect(1, endpoint, "string")
 
@@ -34,8 +34,8 @@ end
 ----------------------------------------------------------------------------------
 
 --- Gets information about the supplied krist address.
--- @param address The krist address
--- @return address table, with address, balance, totalin, totalout, and firstseen.
+--- @param address string The krist address to get information about.
+--- @return table address A table, with address, balance, totalin, totalout, and firstseen.
 function kristly.getAddress(address)
   expect(1, address, "string")
 
@@ -43,9 +43,9 @@ function kristly.getAddress(address)
 end
 
 --- Lists initized krist addresses.
--- @param limit The amount of addresses to return. Between 1-1000. Default: 50
--- @param offset The amount of offset the results. Useful for pagination.
--- @return table with count, total, and a addresses table, which contains the same data you would get from getAddress()
+--- @param limit number|nil The amount of addresses to return. Between 1-1000. Default: 50
+--- @param offset number|nil The amount of offset the results. Useful for pagination.
+--- @return table addressInformation Table with count, total, and a addresses table, which contains the same data you would get from getAddress()
 function kristly.listAddresses(limit, offset)
   expect(1, limit, "nil", "number")
   expect(2, offset, "nil", "number")
@@ -57,9 +57,9 @@ function kristly.listAddresses(limit, offset)
 end
 
 --- Lists the richest krist addresses
--- @param limit The amount of addresses to return. Between 1-1000. Default: 50
--- @param offset The amount of offset the results. Useful for pagination.
--- @return table with count, total, and a addresses table, which contains the same data you would get from getAddress()
+--- @param limit number|nil The amount of addresses to return. Between 1-1000. Default: 50
+--- @param offset number|nil The amount of offset the results. Useful for pagination.
+--- @return table richestAddresses Table with count, total, and an addresses table, which contains the same data you would get from getAddress()
 function kristly.listRichestAddresses(limit, offset)
   expect(1, limit, "nil", "number")
   expect(2, offset, "nil", "number")
@@ -70,12 +70,12 @@ function kristly.listRichestAddresses(limit, offset)
   return basicGET("addresses/rich?limit=" .. limit .. "&offset=" .. offset)
 end
 
---- Lists the recent transactions for a address
--- @param address the address to get transactions from
--- @param excludeMined if we should exclude mined blocks from the transactions
--- @param limit The limit of transactions to return
--- @param offset The amount to offset the results, useful for pagination
--- @return table with count, total, and a table array with transactions
+--- Lists recent transactions for an address
+--- @param address string the address to get transactions from
+--- @param excludeMined boolean|nil If mined block should be excluded
+--- @param limit number|nil The limit of transactions to return
+--- @param offset number|nil The amount to offset the results, useful for pagination
+--- @return table recentTransactions table with count, total, and a table array with transactions
 function kristly.getRecentTransactions(address, excludeMined, limit, offset)
   expect(1, address, "string")
   expect(2, excludeMined, "nil", "boolean")
@@ -90,10 +90,11 @@ function kristly.getRecentTransactions(address, excludeMined, limit, offset)
     address .. "/transactions?limit=" .. limit .. "&offset=" .. offset .. "&excludeMined=" .. excludeMined)
 end
 
---- Lists the names owned by a address
--- @param address the address to get names from
--- @param limit The limit of names to return
--- @param offset The amount to offset the results, useful for pagination
+--- Lists the names owned by an address
+--- @param address string The address to get names from
+--- @param limit number|nil The limit of names to return
+--- @param offset number|nil The amount to offset the results, useful for pagination
+--- @return table names A table of names owned by the address
 function kristly.getNamesOwnedBy(address, limit, offset)
   expect(1, address, "string")
   expect(2, limit, "nil", "number")
@@ -115,33 +116,33 @@ end
 --                                 LOOKUP API                                   --
 ----------------------------------------------------------------------------------
 
--- LOOKUP API IS IN BETA, MAY BE ADDED TO kristly IN THE FUTURE
+-- LOOKUP API IS IN BETA, WILL BE ADDED TO kristly IN THE FUTURE
 
 ----------------------------------------------------------------------------------
 --                                  MISC                                        --
 ----------------------------------------------------------------------------------
 
 --- Gets the current work
--- @return a table with if it is ok and work which contains the current work.
+--- @return table currentWork
 function kristly.getCurrentWork()
   return basicGET("work")
 end
 
 --- Gets the work over the past 24h
--- @return a table with if it is ok and a table of work
+--- @return table last24hWork A table with if the request was ok and a table of work
 function kristly.getLast24hWork()
   return basicGET("work/day")
 end
 
 --- Gets detailed information about work/blocks
--- @return a table with lots of information
+--- @return table detailedWorkInformation A table with lots of information
 function kristly.getDetailedWorkInfo()
   return basicGET("work/detailed")
 end
 
---- Authenticates a address with a private key
--- @param privatekey The privatekey of the address you want to authenticate
--- @return a table with ok and authed key/value pairs
+--- Authenticates an address with a private key
+--- @param privatekey string The privatekey of the address you want to authenticate
+--- @return table authenticationInfo A table with a ok field, and authed key/value pairs
 function kristly.authenticate(privatekey)
   expect(1, privatekey, "string")
 
@@ -149,43 +150,45 @@ function kristly.authenticate(privatekey)
 end
 
 --- Gets information about the krist server (MOTD)
--- @return table with lots of information. Specifications are over at krist.dev/docs
+--- @return table motd Table with lots of information. Specifications are over at krist.dev/docs
 function kristly.getMOTD()
   return basicGET("motd")
 end
 
 --- Gets the latest krist wallet version
--- @return a table with ok and walletVersion key/value pairs
+--- @return table kristwalletVersion Table with ok and walletVersion key/value pairs
 function kristly.getKristWalletVersion()
   return basicGET("walletversion")
 end
 
 --- Gets the latests changes/commits to the krist project
--- @return a table with ok, commits and whatsNew
+--- @return table kristChanges A table with ok, commits and whatsNew
 function kristly.getKristChanges()
   return basicGET("whatsnew")
 end
 
 --- Gets the current supply of krist
--- @return a table with ok and money_supply
+--- @return table kristSupplyInformation table with ok and money_supply
 function kristly.getKristSupply()
   return basicGET("supply")
 end
 
 --- Converts a private key into a krist address
--- @return a table with ok and address porperty
-function kristly.addressFromKey(privateKey)
+--- @param privatekey string The privatekey you want to convert to a public address
+--- @return table addressTable a table with ok and address property
+function kristly.addressFromKey(privatekey)
   expect(1, privatekey, "string")
 
-  return basicJSONPOST("v2", "privatekey=" .. privateKey)
+  return basicJSONPOST("v2", "privatekey=" .. privatekey)
 end
 
 ----------------------------------------------------------------------------------
 --                                  NAMES                                       --
 ----------------------------------------------------------------------------------
 
---- Gets info about a krist name
--- @return a table with information
+--- Gets information about a krist name
+--- @param name string The name you want information about
+--- @return table nameInformation A table with information
 function kristly.getNameInfo(name)
   expect(1, name, "string")
 
@@ -193,9 +196,9 @@ function kristly.getNameInfo(name)
 end
 
 --- Lists currently registered krist names
--- @param limit number The limit of results
--- @param offset The amount to offset the results
--- @returns table with count, total, and a tablearray of names
+--- @param limit number|nil The limit of results
+--- @param offset number|nil The amount to offset the results
+--- @return table kristNames A table with count, total, and a tablearray of names
 function kristly.getKristNames(limit, offset)
   expect(1, limit, "nil", "number")
   expect(2, offset, "nil", "number")
@@ -207,9 +210,9 @@ function kristly.getKristNames(limit, offset)
 end
 
 --- Lists currently registered krist names sorted by newest
--- @param limit number The limit of results
--- @param offset The amount to offset the results
--- @returns table with count, total, and a tablearray of names
+--- @param limit number|nil The max amount of results
+--- @param offset number|nil The amount to offset the results
+--- @return table kristNames A table with count, total, and a tablearray of names
 function kristly.getNewestKristNames(limit, offset)
   expect(1, limit, "nil", "number")
   expect(2, offset, "nil", "number")
@@ -220,31 +223,31 @@ function kristly.getNewestKristNames(limit, offset)
   return basicGET("names/new?limit=" .. limit .. "&offset=" .. offset)
 end
 
----Gets the price of a krist name
--- @return a table with ok and name_cost properties
+--- Gets the price for purchasing krist names
+--- @return table namePriceInformation A table with ok and name_cost property
 function kristly.getNamePrice()
   return basicGET("names/cost")
 end
 
 --- Gets the current name bonus. Simply: Amount of names bought in the latest 500 blocks
--- @return a table with ok and name_bonus
+--- @return table nameBonusInformation A table with ok and name_bonus
 function kristly.getCurrentNameBonus()
   return basicGET("names/bonus")
 end
 
 --- Check if the supplied krist name is available
--- @param name The krist name
--- @return a table with ok and available properties
+--- @param name string The krist name to check if is available for purchase
+--- @return table nameAvailablityInformation A table with `ok` and `available` property
 function kristly.isNameAvailable(name)
   expect(1, name, "string")
 
   return basicGET("names/check/" .. name)
 end
 
---- Tries to register a krist name
--- @param name The krist name that should be registered
--- @param privatekey The krist privatekey. This should never be shared.
--- @return a table with a propery named ok. If ok is false it also contains a error property
+--- Attempts to register a krist name
+--- @param name string The krist name that should be registered
+--- @param privatekey string The krist privatekey of the wallet that should purchase the name. This should never be shared.
+--- @return table results A table with a propery named ok. If ok is false it also contains a error property
 function kristly.purchaseName(name, privatekey)
   expect(1, name, "string")
   expect(2, privatekey, "string")
@@ -253,10 +256,10 @@ function kristly.purchaseName(name, privatekey)
 end
 
 --- Tries to transfer a name from one krist address to another krist address
--- @param name The krist name that should be transferred
--- @param fromPrivatekey The krist privatekey of the krist address the name will be transferred from
--- @param addressTo The krist address that the name should be transferred to
--- @return A table with ok propery and a name property if ok was true, or else a error property
+--- @param name string The krist name that should be transferred
+--- @param fromPrivatekey string The privatekey of the krist address that name will be transferred from
+--- @param addressTo string The krist address that the name should be transferred to
+--- @return table nameTransferReults A table with ok propery and a name property. if ok was false, there should be a error propery
 function kristly.transferName(name, addressTo, fromPrivatekey)
   expect(1, name, "string")
   expect(2, addressTo, "string")
@@ -266,16 +269,16 @@ function kristly.transferName(name, addressTo, fromPrivatekey)
 end
 
 --- Updates the data of a name, also knows as a A record
--- @param name The krist name that should get A record changed
--- @param privatekey The krist private key that ownes the krist name
--- @param newData The new data of the krist private key
--- @return a table with a ok property
+--- @param name string The krist name that should get A record changed
+--- @param privatekey string The krist private key that ownes the krist name
+--- @param newData string|nil The new data of the name
+--- @return table ARecordChangeInformation A table with a ok property
 function kristly.updateDataOfName(name, privatekey, newData)
   expect(1, name, "string")
   expect(2, privatekey, "string")
   expect(3, newData, "nil", "string")
 
-  newData = newData or "Powered by Kristly"
+  newData = newData or ""
 
   return basicJSONPOST("names/" .. name .. "/update", "privatekey=" .. privatekey .. "&newData=" .. newData)
 end
@@ -285,10 +288,10 @@ end
 ----------------------------------------------------------------------------------
 
 --- Gets a list of transactions. This is not the latest transctions!
--- @param excludeMined If we should exclude transactions coming from mining
--- @param limit The max amount of transactions to return.
--- @param offset The amount to offset the transaction list. Useful for pagination.
--- @return a table with the following fields: count, total, transactions(tablearray of transactions).
+--- @param excludeMined boolean|nil If we should exclude transactions coming from mining
+--- @param limit number|nil The max amount of transactions to return.
+--- @param offset number|nil The amount to offset the transaction list. Useful for pagination.
+--- @return table listOfTransactions A table with the following fields: count, total, transactions(tablearray of transactions).
 function kristly.listAllTransactions(excludeMined, limit, offset)
   expect(1, excludeMined, "nil", "boolean")
   expect(2, limit, "nil", "number")
@@ -301,11 +304,11 @@ function kristly.listAllTransactions(excludeMined, limit, offset)
   return basicGET("transactions?excludeMined=" .. excludeMined .. "&limit=" .. limit .. "&offset=" .. offset)
 end
 
---- Gets a list of the latesttransactions.
--- @param excludeMined If we should exclude transactions coming from mining
--- @param limit The max amount of transactions to return.
--- @param offset The amount to offset the transaction list. Useful for pagination.
--- @return a table with the following fields: count, total, transactions(tablearray of transactions).
+--- Gets a list of the latest ransactions.
+--- @param excludeMined boolean|nil If we should exclude transactions coming from mining
+--- @param limit number|nil The max amount of transactions to return.
+--- @param offset number|nil The amount to offset the transaction list. Useful for pagination.
+--- @return table latestTransactionsInformation A table with the following fields: count, total, transactions(tablearray of transactions).
 function kristly.listLatestTransactions(excludeMined, limit, offset)
   expect(1, excludeMined, "nil", "boolean")
   expect(2, limit, "nil", "number")
@@ -318,20 +321,20 @@ function kristly.listLatestTransactions(excludeMined, limit, offset)
   return basicGET("transactions/latest?excludeMined=" .. excludeMined .. "&limit=" .. limit .. "&offset=" .. offset)
 end
 
---- Gets data about a specific transaction.
--- @param transactionID the ID of the transaction.
--- @return A table with one property: transaction
+--- Gets information about a specific transaction.
+--- @param transactionID string the ID of the transaction.
+--- @return table transactionInformation A table with one property: transaction
 function kristly.getTransaction(transactionID)
   expect(1, transactionID, "number")
 
   return basicGET("transactions/" .. transactionID)
 end
 
---- Transfer the specified amount from the specified privatekey's address
--- @param privatekey the krist privatekey of the address that the transaction should be from
--- @param to the krist address of the person recieveing the krist
--- @param amount the amount of krist to send
--- @param metadata option parameter that will contain metadata
+--- Transfer the specified amount from the specified privatekey's address to another address
+--- @param privatekey string The krist privatekey of the address that the transaction should be from
+--- @param to string The krist address of the person recieveing the krist
+--- @param amount number The amount of krist to send
+--- @param metadata string|nil Optional parameter that contains metadata
 function kristly.makeTransaction(privatekey, to, amount, metadata)
   expect(1, privatekey, "string")
   expect(2, to, "string")
@@ -349,8 +352,8 @@ end
 ----------------------------------------------------------------------------------
 
 --- Generates a krist websocket url.
--- @param privatekey Optional: Privatekey of a wallet
--- @return A url to connect to with websocket
+--- @param privatekey string|nil Optional: Privatekey of a wallet
+--- @return table url A url to connect to with websocket
 function kristly.generateWSUrl(privatekey)
   expect(1, privatekey, "nil", "string")
 
@@ -359,8 +362,8 @@ function kristly.generateWSUrl(privatekey)
 end
 
 --- Creates a new Kristly Websocket.
--- @param privatekey Optional: the private key of the connection.
--- @return a kristly ws object. Have fun with it!
+--- @param privatekey string Optional: the private key of the connection.
+--- @return table kristlyWS a kristly ws object. Have fun with it!
 function kristly.websocket(privatekey)
   expect(1, privatekey, "nil", "string")
 
@@ -372,8 +375,8 @@ function kristly.websocket(privatekey)
 end
 
 --- Creates a new Kristly websocket object.
--- @param o object with ws object inside.
--- @return a instance of Kristly WS
+--- @param o table Table with ws object inside.
+--- @return table o a instance of Kristly WS
 function kristlyWS:new(o)
   expect(1, o, "nil", "table")
 
@@ -384,9 +387,9 @@ function kristlyWS:new(o)
 end
 
 --- Sends a simple websocket message to the krist server
--- @param type The action you would like to take
--- @param table Optional arguments
--- @return id The ID to listen after
+--- @param type string The action you would like to take
+--- @param table table|nil Optional arguments
+--- @return number id The ID to listen after
 function kristlyWS:simpleWSMessage(type, table)
   expect(1, type, "string")
   expect(2, table, "nil", "table")
@@ -424,7 +427,7 @@ end
 
 --- Upgrade the WS connection.
 -- This will make a unauthed connection into a authed one
--- @param privateKey The krist private key that you want to login to.
+--- @param privateKey string The krist private key that you want to login to.
 function kristlyWS:upgradeConnection(privateKey)
   expect(1, privateKey, "string")
 
@@ -435,7 +438,7 @@ end
 
 --- Subscribe to a krist event
 -- This will make kristly recieve for example transaction events
--- @param event The event to subscribe to.
+--- @param event string The event to subscribe to.
 function kristlyWS:subscribe(event)
   expect(1, event, "string")
 
