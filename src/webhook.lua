@@ -1,5 +1,6 @@
 local webhooks = {}
 local expect = require("cc.expect").expect
+
 ---Sends a webhook to a Discord Guild
 ---@param URL string The webhook URL
 ---@param message string The message to send
