@@ -1,6 +1,7 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
 local logger = require("/src/logger"):new({ debugging = true })
+local invlib = require("/src/libs/inv")
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -12,6 +13,10 @@ if config == nil or config.pkey == nil then
   logger:error("Config not found! Check documentation for more info.")
   return
 end
+
+logger:info("Configuration loaded.")
+
+local storage = invlib(config.storage)
 
 -- TODO Make autofix
 if utils.endsWith(config.name, ".kst") then
@@ -41,6 +46,7 @@ local function startListening()
 
           handleTransaction(transaction)
         elseif transaction.sent_name == config.name then
+          logger.info("No metaname found. Refunding.")
           kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
             "message=Refunded. No metaname found")
         end
@@ -53,16 +59,19 @@ local function startListening()
 end
 
 function handleTransaction(transaction)
+  logger:debug("Handle Transaction")
   local product = utils.getProduct(products, transaction.sent_metaname)
 
   if product == false or product == nil then
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
       "message=Hey! The item `" .. transaction.sent_metaname .. "` is not available.")
+    logger:debug("Item does not exist.")
     return
   end
 
 
   if transaction.value < product.price then
+    logger:info("Not enogth money sent. Refunding.")
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
       "message=Insufficient amount of krist sent.")
     return
@@ -71,12 +80,30 @@ function handleTransaction(transaction)
   local amount = math.floor(transaction.value / product.price)
   local change = transaction.value - (amount * product.price)
 
+  logger:debug("Amount: " .. amount .. " Change: " .. change)
+
+  local itemsInStock = storage.getCount(product.id)
+  if amount > itemsInStock then
+    logger:info("Not enogth in stock. Refunding")
+    logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
+    kristly.makeTransaction(config.pkey, transaction.from, amount * product.price,
+      "message=We don't have that much stock!")
+    return
+  end
+
   if change ~= 0 then
+    logger:debug("Sending out change")
     kristly.makeTransaction(config.pkey, transaction.from, change,
       "message=Here is your change! Thanks for using our shop.")
   end
 
-  logger:info("Dispensing " .. amount .. " item(s).")
+  logger:info("Dispensing " .. amount .. product.id .. " (s).")
+
+  local turns = math.ceil(amount / 64 / 16)
+  local lastTurn = amount - ((turns - 1) * 64 * 16)
+
+  logger:debug("Taking " .. turns .. " turns, last one has " .. lastTurn)
+
 end
 
 local function startKristly()

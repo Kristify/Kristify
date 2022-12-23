@@ -1,4 +1,7 @@
 return {
   pkey = "",
-  name = ""
+  name = "",
+  storge = {
+    ""
+  }
 }
