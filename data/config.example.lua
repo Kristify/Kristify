@@ -14,7 +14,7 @@ return {
   },
   webhooks = {
     {
-      type = "discord",
+      type = "discord-modern",
       url = ""
     }
   },

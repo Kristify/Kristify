@@ -143,6 +143,9 @@ function handleTransaction(transaction)
     logger:debug("Webhook: ", webhook.type, webhook.URL)
     if webhook.type == "discord" then
       webhooks.discord(webhook.URL, message)
+    elseif webhook.type == "discord-modern" then
+      webhooks.discordModern(webhook.URL, transaction.from, product.id, amount * product.price, transaction.id,
+        transaction.to)
     elseif webhook.type == "googleChat" then
       webhooks.googleChat(webhook.URL, message)
     end
