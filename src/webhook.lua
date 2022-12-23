@@ -35,6 +35,9 @@ function webhooks.discordModern(URL, user, item, total, transactionID, addrs)
   expect(5, transactionID, "number")
   expect(6, addrs, "string")
 
+  local kristweb = "[KristWeb](https://krist.club/network/transactions/" .. transactionID .. ")"
+  local openWithURI = "<krist://tx/" .. transactionID .. "> (URI)"
+
   local data = {
     content = "",
     username = "Kristify",
@@ -42,7 +45,6 @@ function webhooks.discordModern(URL, user, item, total, transactionID, addrs)
     embeds = {
       {
         title = user .. " bought " .. item,
-        url = "https://krist.club/network/transactions/" .. transactionID,
         color = "16750744",
         fields = {
           {
@@ -57,6 +59,10 @@ function webhooks.discordModern(URL, user, item, total, transactionID, addrs)
             name = "Krist earned",
             value = total
           },
+          {
+            name = "Open with",
+            value = kristweb .. " or " .. openWithURI
+          }
         },
         author = {
           name = "Someone bought something!"
