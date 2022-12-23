@@ -1,9 +1,8 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
-local loggerImport = require("/src/libs/logger")
-local logger = loggerImport:new({ debugging = true })
+local logger = require("/src/libs/logger"):new({ debugging = true })
 
-logger:info("Starting Kristify! Thanks for choosing us.")
+logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
 local config = require("/data/config")
