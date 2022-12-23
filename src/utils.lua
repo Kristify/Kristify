@@ -26,7 +26,7 @@ end
 ---Gets a product by name
 ---@param products table
 ---@param metaname string
----@return table|false
+---@return table|boolean
 function utils.getProduct(products, metaname)
   for _, product in ipairs(products) do
     if product.metaname == metaname then
