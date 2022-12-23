@@ -1,6 +1,7 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
 local logger = require("/src/logger"):new({ debugging = true })
+local webhooks = require("/src/webhook")
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -119,6 +120,19 @@ function handleTransaction(transaction)
     for i = 1, 16 do
       turtle.select(i)
       turtle.drop()
+    end
+  end
+
+  local message = "Kristify: `" ..
+      transaction.from .. "` bought " .. amount .. "x " .. product.id .. " (" .. transaction.value .. "kst)"
+
+  logger:debug("Running webhooks")
+  for _, webhook in ipairs(config.webhooks) do
+    logger:debug("Webhook: ", webhook.type, webhook.URL)
+    if webhook.type == "discord" then
+      webhooks.discord(webhook.URL, message)
+    elseif webhook.type == "googleChat" then
+      webhooks.googleChat(webhook.URL, message)
     end
   end
 end

@@ -11,5 +11,11 @@ return {
     notEnogthMoney  = "message=Insufficient amount of krist sent.",
     notEnogthStock  = "message=We don't have that much stock!",
     change          = "message=Here is your change! Thanks for using our shop."
-  }
+  },
+  webhooks = {
+    {
+      type = "discord",
+      url = ""
+    }
+  },
 }
