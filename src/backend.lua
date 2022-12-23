@@ -49,7 +49,7 @@ local function startListening()
         elseif transaction.sent_name == config.name then
           logger.info("No metaname found. Refunding.")
           kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-            "message=Refunded. No metaname found")
+            config.messages.noMetaname)
         end
       end
 
@@ -65,7 +65,7 @@ function handleTransaction(transaction)
 
   if product == false or product == nil then
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      "message=Hey! The item `" .. transaction.sent_metaname .. "` is not available.")
+      config.messages.nonexistantItem)
     logger:debug("Item does not exist.")
     return
   end
@@ -74,7 +74,7 @@ function handleTransaction(transaction)
   if transaction.value < product.price then
     logger:info("Not enogth money sent. Refunding.")
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      "message=Insufficient amount of krist sent.")
+      config.messages.notEnogthMoney)
     return
   end
 
@@ -89,14 +89,13 @@ function handleTransaction(transaction)
     logger:info("Not enogth in stock. Refunding")
     logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
     kristly.makeTransaction(config.pkey, transaction.from, amount * product.price,
-      "message=We don't have that much stock!")
+      config.messages.notEnogthStock)
     return
   end
 
   if change ~= 0 then
     logger:debug("Sending out change")
-    kristly.makeTransaction(config.pkey, transaction.from, change,
-      "message=Here is your change! Thanks for using our shop.")
+    kristly.makeTransaction(config.pkey, transaction.from, change, config.messages.change)
   end
 
   logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
