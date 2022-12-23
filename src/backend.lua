@@ -1,7 +1,6 @@
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
 local logger = require("/src/logger"):new({ debugging = true })
-local invlib = require("/src/libs/inv")
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -16,13 +15,13 @@ end
 
 logger:info("Configuration loaded. Indexing chests")
 
-local storage = invlib(config.storage)
-storage.refreshStorage(false)
+local storage = require("/src/libs/inv")(config.storage)
+storage.refreshStorage()
 logger:info("Chests indexed.")
 
 -- TODO Make autofix
 if utils.endsWith(config.name, ".kst") then
-  logger:error("The krist name configured contains `.kst`, which it should not.")
+  logger:error("The krist name that is configured contains `.kst`, which it should not.")
   return
 end
 
@@ -38,7 +37,7 @@ local function startListening()
     if data.type == "keepalive" then
       logger:debug("Keepalive packet")
     elseif data.type == "event" then
-      logger:debug("Event: " .. data.event)
+      logger:debug("Krist event: " .. data.event)
 
       if data.event == "transaction" then
         local transaction = data.transaction
@@ -80,7 +79,7 @@ function handleTransaction(transaction)
   end
 
   local amount = math.floor(transaction.value / product.price)
-  local change = transaction.value - (amount * product.price)
+  local change = math.floor(transaction.value - (amount * product.price))
 
   logger:debug("Amount: " .. amount .. " Change: " .. change)
 
@@ -123,8 +122,6 @@ function handleTransaction(transaction)
       turtle.drop()
     end
   end
-
-
 end
 
 local function startKristly()
