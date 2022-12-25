@@ -83,9 +83,9 @@ function handleTransaction(transaction)
 
 
   if transaction.value < product.price then
-    logger:info("Not enogth money sent. Refunding.")
+    logger:info("Not enough money sent. Refunding.")
     kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      config.messages.notEnogthMoney)
+      config.messages.notEnoughMoney)
     speaker:play("error")
     return
   end
@@ -98,10 +98,10 @@ function handleTransaction(transaction)
   local itemsInStock = storage.getCount(product.id)
   logger:debug("Managed to get stock: " .. itemsInStock)
   if amount > itemsInStock then
-    logger:info("Not enogth in stock. Refunding")
+    logger:info("Not enough in stock. Refunding")
     logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
     kristly.makeTransaction(config.pkey, transaction.from, amount * product.price,
-      config.messages.notEnogthStock)
+      config.messages.notEnoughStock)
     speaker:play("error")
     return
   end
