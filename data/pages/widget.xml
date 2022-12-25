@@ -1,0 +1,16 @@
+<frame id="_widget" width="parent.w/2-1" height="parent.w/6-1">
+    <pane bgSymbol=" " bg="lightGray" x="1" y="2" width="parent.w-1" height="parent.h-2" />
+    
+    <label text="&#135;" x="1" y="1" bg="lightGray" fg="gray" />
+    <label text="&#144;" x="parent.w-1" y="1" bg="gray" fg="lightGray" />
+    <label text="&#139;" x="1" y="parent.h-1" bg="gray" fg="lightGray" />
+    <label text="&#129;" x="parent.w-1" y="parent.h-1" bg="black" fg="lightGray" />
+
+    <pane bgSymbol="&#131;" bgSymbolColor="gray" bg="lightGray" x="2" y="1" width="parent.w-3" height="1" />
+    <pane bgSymbol="&#143;" bgSymbolColor="lightGray" bg="black" x="2" y="parent.h-1" width="parent.w-3" height="1" />
+    <pane bgSymbol="&#149;" bgSymbolColor="lightGray" bg="black" x="parent.w-1" y="2" width="1" height="parent.h-3" />
+
+    <label id="_name" text="Diamonds" x="2" y="2" />
+    <label id="_onStock" text="42x" x="3" y="3" fg="gray" />
+    <button id="_purchase" onClick="buyItem" text="GET" x="parent.w-(self.w+1)" y="parent.h-2" width="5" height="1" bg="green" fg="white" />
+</frame>

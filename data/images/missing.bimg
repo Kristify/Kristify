@@ -1,15 +1,0 @@
-{
-  {
-		{"","787","808"},
-		{"","080","808"},
-		{"","708","887"}
-	},
-	version = "1.0.0",
-  animation = false,
-  title = "Missing bimg",
-  description = "Oh oh, the source is missing!",
-  author = "Kristify",
-  creator = "Keyboard and Mouse",
-  date = "2022-09-11T19:04:24+0000",
-}
-

@@ -1,6 +1,0 @@
-<frame id="=Home" height="parent.h+11">
-    <label id="title" y="3" x="parent.w/2-self.w/2+1" size="2" font="Times9k" text="-~ %s ~-" />
-    <breakline x="2" y="5" dirType="horizontal" length="parent.w-2" fg="cyan"/>
-    <label id="subtitle" x="3" y="7" width="parent.w-4" text="%s"/>
-    <frame id="products" x="3" y="12" width="parent.w-4"/>
-</frame>
