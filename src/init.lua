@@ -91,31 +91,28 @@ local function init(...)
 end
 
 -- INIT
-local noErrors = true
 local args = table.pack(...)
 xpcall(function()
     init(table.unpack(args, 1, args.n))
 end, function(err)
     printError(err)
-    noErrors = false
+    return
 end)
 
 -- MAIN
 local function execFile(sPath)
     local script, err = loadfile(sPath, "t", _ENV)
     if not script then
-        printError(err)
+        ctx.logger:error(err)
     end
     script(ctx)
 end
 
-if noErrors then
-    parallel.waitForAny(
-        function()
-            execFile(fs.combine(sSrc, "backend.lua"))
-        end,
-        function()
-            execFile(fs.combine(sSrc, "frontend.lua"))
-        end
-    )
-end
+parallel.waitForAny(
+    function()
+        execFile(fs.combine(sSrc, "backend.lua"))
+    end,
+    function()
+        execFile(fs.combine(sSrc, "frontend.lua"))
+    end
+)

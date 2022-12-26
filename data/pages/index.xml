@@ -1,8 +1,8 @@
 <frame id="_app">
     <frame id="_body" x="3" y="9" width="parent.w-2" height="parent.h-9" bg="gray" />
     <frame id="_head" x="1" y="1" width="parent.w" height="8">
-        <label id="_title" text="" font='2' x="(parent.w/2)-(self.w/2)-2" y="3" fg="green" bg="gray" />
-        <label id="_title_end" text=".kst" font='1' x="1" y="5" fg="green" bg="gray" />
+        <label id="_title" text="" font='2' x="(parent.w/2)-(self.w/2)" y="3" fg="green" bg="gray" />
+        <label id="_title_end" text=".kst" font='1' x="1" y="5" fg="lightGray" bg="gray" />
         
         <label id="_watermark" text="" x="1" y="1" bg="gray" fg="lightGray" />
         <button id="_helpButton" text="" onClick="openHelpDialog" x="parent.w" y="1" width="1" height="1" bg="gray" fg="lightGray" />

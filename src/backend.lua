@@ -170,6 +170,7 @@ function handleTransaction(transaction)
     end
   end
 
+  os.queueEvent("kstUpdateProducts")
   speaker:play("purchase")
 end
 

@@ -33,7 +33,7 @@ local base = basalt.createFrame()
 
 -- Adjust theme
 local title = searchObject(base, "_title")
-    :setText("@"..ctx.config.name)
+    :setText(ctx.config.name)
 local nW = title:getSize()
 local nX = title:getPosition()
 
@@ -49,7 +49,7 @@ local helpBtn = searchObject(base, "_helpButton")
 
 local subtitle = searchObject(base, "_subtitle")
 
-local moveSubtitle = base:addThread()
+base:addThread("_moveSubtitle")
     :start(function()
         local nW = subtitle:getSize()
         if #ctx.config.tagline <= nW then return end
@@ -74,6 +74,7 @@ local moveSubtitle = base:addThread()
 -- Events
 basalt.onEvent(function(event)
     if event == "kstUpdateProducts" then
+        storage.refreshStorage()
         local body = searchObject(base, "_body")
         -- Clear
         repeat
