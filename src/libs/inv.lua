@@ -179,7 +179,7 @@ function abstractInventory(inventories, assumeLimits)
     local deepCacheFunctions = {}
     for _, inventory in pairs(inventories) do
       emptySlotLUT[inventory] = {}
-      for i = 1, peripheral.call(inventory, "size") do
+      for i = 1, (peripheral.call(inventory, "size") or 0) do
         emptySlotLUT[inventory][i] = true
         local slotnumber = #slotNumberLUT + 1
         slotNumberLUT[slotnumber] = { inventory = inventory, slot = i }
@@ -188,7 +188,7 @@ function abstractInventory(inventories, assumeLimits)
       end
       inventoryLimit[inventory] = peripheral.call(inventory, "getItemLimit", 1) -- this should make transfers from/to this inventory parallel safe.
       if not deep then
-        for slot, item in pairs(peripheral.call(inventory, "list")) do
+        for slot, item in pairs(peripheral.call(inventory, "list") or {}) do
           cacheItem(item, inventory, slot)
         end
       else

@@ -1,20 +1,16 @@
-settings.define("kristify.debug", {
-  description = "If kristify should be debugging",
-  default = false,
-  type = "boolean"
-})
+local ctx = ({...})[1]
 
-local kristly = require("/src/libs/kristly")
-local utils = require("/src/utils")
-local logger = require("/src/logger"):new({ debugging = settings.get("kristify.debug") })
-local webhooks = require("/src/webhook")
-local speakerLib = require("/src/speaker")
+local kristly = ctx.kristly
+local utils = ctx.utils
+local logger = ctx.logger
+local webhooks = ctx.webhooks
+local speakerLib = ctx.speakerLib
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
-local config = require("/data/config")
-local products = require("/data/products")
+local config = ctx.config
+local products = ctx.products
 
 if config == nil or config.pkey == nil then
   logger:error("Config not found! Check documentation for more info.")
@@ -51,7 +47,7 @@ end
 
 logger:info("Configuration loaded. Indexing chests")
 
-local storage = require("/src/libs/inv")(config.storage)
+local storage = ctx.storage
 storage.refreshStorage()
 logger:info("Chests indexed.")
 

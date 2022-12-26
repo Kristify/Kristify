@@ -11,7 +11,8 @@ local function init(...)
     ctx = { products = {}, theme = {}, config = {}, pages = {} }
     ctx.path = {
         page = sPage,
-        src = sSrc
+        src = sSrc,
+        data = sData
     }
 
     -- [Pages]
@@ -56,20 +57,35 @@ local function init(...)
     local inferiorcol = col;
     inferiorcol.gray = col.grey;
     inferiorcol.lightGray = col.lightGrey
-    local result = loadLuaFile(fs.combine(sPage, "theme.lua"), { colours = col, colors = inferiorcol })
+    local result = loadLuaFile(fs.combine(sPage,"theme.lua"), { colours = col, colors = inferiorcol })
     if result then
         ctx.theme = result
     end
     -- config
-    result = loadLuaFile(fs.combine(sData, "config.lua"))
+    result = loadLuaFile(fs.combine(sData,"config.lua"))
     if result then
         ctx.config = result
     end
     -- products
-    result = loadLuaFile(fs.combine(sData, "products.lua"))
+    result = loadLuaFile(fs.combine(sData,"products.lua"))
     if result then
         ctx.products = result
     end
+
+    -- Set debug mode
+    settings.define("kristify.debug", {
+        description = "If kristify should be debugging",
+        default = false,
+        type = "boolean"
+    })
+
+    -- Load scripts
+    ctx.kristly = require(fs.combine("libs","kristly"))
+    ctx.utils = require("utils")
+    ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug") })
+    ctx.webhooks = require("webhook")
+    ctx.speakerLib = require("speaker")
+    ctx.storage = require(fs.combine("libs","inv"))(ctx.config.storage)
 
     return ctx
 end
@@ -85,10 +101,21 @@ end, function(err)
 end)
 
 -- MAIN
-if noErrors then
-    local frontend, err = loadfile(fs.combine(sSrc, "frontend.lua"), "t", _ENV)
-    if not frontend then
+local function execFile(sPath)
+    local script, err = loadfile(sPath, "t", _ENV)
+    if not script then
         printError(err)
     end
-    frontend(ctx)
+    script(ctx)
+end
+
+if noErrors then
+    parallel.waitForAny(
+        function()
+            execFile(fs.combine(sSrc, "backend.lua"))
+        end,
+        function()
+            execFile(fs.combine(sSrc, "frontend.lua"))
+        end
+    )
 end

@@ -6,6 +6,9 @@ return {
   storage = {
     ""
   },
+  speaker = {
+    ""
+  },
   self = "",
   messages = {
     noMetaname      = "message=No metaname found! Refunding.",
