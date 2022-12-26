@@ -1,4 +1,3 @@
-
 settings.define("kristify.debug", {
   description = "If kristify should be debugging",
   default = false,
@@ -22,22 +21,39 @@ if config == nil or config.pkey == nil then
   return
 end
 
+local speaker = speakerLib:new({
+  config = config
+})
+
+if config.storage == nil or #config.storage == 0 then
+  logger:error("Missing storage chests")
+  speaker:play("error")
+  return
+end
+
+if config.monSide == nil then
+  logger:error("Missing monitor side in config")
+  speaker:play("error")
+  return
+end
+
+if config.self == nil then
+  logger:error("Config does not include self field")
+  speaker:play("error")
+  return
+end
+
+if utils.endsWith(config.name, ".kst") then
+  logger:error("The krist name that is configured either contains `.kst`, which it should not, or is not defined.")
+  speaker:play("error")
+  return
+end
+
 logger:info("Configuration loaded. Indexing chests")
 
 local storage = require("/src/libs/inv")(config.storage)
 storage.refreshStorage()
 logger:info("Chests indexed.")
-
-local speaker = speakerLib:new({
-  config = config
-})
-
--- TODO Make autofix
-if utils.endsWith(config.name, ".kst") then
-  logger:error("The krist name that is configured contains `.kst`, which it should not.")
-  speaker:play("error")
-  return
-end
 
 local ws = kristly.websocket(config.pkey)
 
