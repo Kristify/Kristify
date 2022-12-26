@@ -1,6 +1,13 @@
+
+settings.define("kristify.debug", {
+  description = "If kristify should be debugging",
+  default = false,
+  type = "boolean"
+})
+
 local kristly = require("/src/libs/kristly")
 local utils = require("/src/utils")
-local logger = require("/src/logger"):new({ debugging = true })
+local logger = require("/src/logger"):new({ debugging = settings.get("kristify.debug") })
 local webhooks = require("/src/webhook")
 local speakerLib = require("/src/speaker")
 

@@ -1,6 +1,9 @@
 # Configuration files
 config.lua
 
+# .settings
+.settings
+
 # Compiled Lua sources
 luac.out
 
