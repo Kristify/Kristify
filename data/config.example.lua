@@ -1,6 +1,8 @@
 return {
   pkey = "",
   name = "",
+  submsg = "",
+  monSide = "",
   storage = {
     ""
   },

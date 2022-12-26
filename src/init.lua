@@ -10,7 +10,8 @@ local function init(...)
     -- [Context]
     ctx = { products = {}, theme = {}, config = {}, pages = {} }
     ctx.path = {
-        page = sPage
+        page = sPage,
+        src = sSrc
     }
 
     -- [Pages]

@@ -1,17 +1,20 @@
 <frame id="_app">
-    <frame id="_body" x="(parent.w/2)-((parent.w/1.4)/2)+1" y="9" width="parent.w/1.4" height="parent.h-8" bg="gray" />
+    <frame id="_body" x="3" y="9" width="parent.w-2" height="parent.h-9" bg="gray" />
     <frame id="_head" x="1" y="1" width="parent.w" height="8">
-        <label id="_title" text="GoDiamonds" font='2' x="(parent.w/2)-(self.w/2)" y="3" fg="green" bg="gray" />
+        <label id="_title" font='2' x="(parent.w/2)-(self.w/2)-2" y="3" fg="green" bg="gray" />
+        <label id="_title_end" text=".kst" font='1' x="1" y="5" fg="green" bg="gray" />
         
-        <label id="_watermark" text="Kristify" x="1" y="1" bg="gray" fg="lightGray" />
-        <button id="_helpButton" onClick="openHelpDialog" text="?" x="parent.w" y="1" width="1" height="1" bg="gray" fg="lightGray" />
+        <label id="_watermark" x="1" y="1" bg="gray" fg="lightGray" />
+        <button id="_helpButton" onClick="openHelpDialog" x="parent.w" y="1" width="1" height="1" bg="gray" fg="lightGray" />
         
         <frame x="parent.w/2-parent.w/4-1" y="6" width="parent.w/2+1" height="2">
             <pane bgSymbol="&#143;" bgSymbolColor="gray" bg="white" x="2" y="1" width="parent.w-3" height="1" />
             <label text="&#138;" x="1" y="2" bg="gray" fg="white" />
             <label text="&#133;" x="parent.w-1" y="2" bg="gray" fg="white" />
-            <button id="_selectCategory" onClick="selectNewCategory" text="All" x="2" y="2" width="parent.w-3" height="1" bg="white" fg="black" />
+            <label id="_subtitle" x="2" y="2" width="parent.w-3" height="1" bg="white" fg="black" />
         </frame>
         <pane bgSymbol="&#143;" bgSymbolColor="gray" bg="black" x="2" y="8" width="parent.w-2" height="1" />
     </frame>
+    <pane bg="black" x="1" y="parent.h" width="parent.w" height="1" />
+    <label id="_importantMSG" text="" x="1" y="parent.h" bg="black" fg="white" />
 </frame>
