@@ -52,20 +52,20 @@ local subtitle = searchObject(base, "_subtitle")
 local moveSubtitle = base:addThread()
     :start(function()
         local nW = subtitle:getSize()
-        if #ctx.config.submsg <= nW then return end
+        if #ctx.config.tagline <= nW then return end
         
         local i,cooldown = 1,7
         while true do
             if cooldown <= 0 then
                 i = i+1
-                if i > (#ctx.config.submsg)+5 then
+                if i > (#ctx.config.tagline)+5 then
                     i = 1
                     cooldown = 7
                 end
             else
                 cooldown = cooldown-1
             end
-            subtitle:setText(ctx.config.submsg:sub(i))
+            subtitle:setText(ctx.config.tagline:sub(i))
             sleep(0.2)
         end 
     end

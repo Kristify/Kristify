@@ -1,7 +1,7 @@
 return {
   pkey = "",
   name = "",
-  submsg = "",
+  tagline = "",
   monSide = "",
   storage = {
     ""
