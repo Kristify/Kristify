@@ -21,12 +21,41 @@ local function searchObject(base, id)
 end
 
 -- Button functoins
-basalt.setVariable("openHelpDialog", function()
-    basalt.debug("But nobody came.")
+local base
+local bubbles = {}
+basalt.setVariable("openHelpDialog", function(self)
+    ctx.logger:info("Opening help dialog")
+    local nW = base:getSize()
+    local nX,nY = self:getPosition()
+    local nSubW = self:getSize()
+
+    local bubble = base:addLayout(fs.combine(ctx.path.page, "bubble.xml"))
+    bubble = searchObject(base, "_bubble")
+    bubbles[#bubbles+1] = bubble
+    bubble.name = "_bubble"..#bubble
+
+    bubble:setSize(10,2)
+    local nBSubW = bubble:getSize()
+    bubble
+        :setPosition(nX+((nX>nW/2) and (-(nBSubW+1)) or (nSubW+1)), nY)
+        :addThread("_lifetimeTask")
+        :start(function()
+            for _=1,4 do
+                sleep(1)
+            end
+            base:removeObject(bubble)
+            for i,obj in pairs(bubbles) do
+                if obj == bubble then
+                    table.remove(bubbles, i)
+                    break
+                end
+            end
+        end
+    )
 end)
 
 -- Create frame
-local base = basalt.createFrame()
+base = basalt.createFrame()
     :setMonitor(ctx.config.monSide)
     :setTheme(ctx.theme)
     :addLayout(fs.combine(ctx.path.page, "index.xml"))
@@ -52,7 +81,10 @@ local subtitle = searchObject(base, "_subtitle")
 base:addThread("_moveSubtitle")
     :start(function()
         local nW = subtitle:getSize()
-        if #ctx.config.tagline <= nW then return end
+        if #ctx.config.tagline <= nW then
+            subtitle:setText(ctx.config.tagline)
+            return
+        end
         
         local i,cooldown = 1,7
         while true do
@@ -67,7 +99,7 @@ base:addThread("_moveSubtitle")
             end
             subtitle:setText(ctx.config.tagline:sub(i))
             sleep(0.2)
-        end 
+        end
     end
 )
 

@@ -1,0 +1,12 @@
+<frame id="_bubble">
+    <pane bgSymbol=" " bg="green" x="1" y="2" width="parent.w-1" height="parent.h-2" />
+    
+    <label text="&#135;" x="1" y="1" bg="green" fg="gray" />
+    <label text="&#144;" x="parent.w-1" y="1" bg="gray" fg="green" />
+    <label text="&#139;" x="1" y="parent.h" bg="gray" fg="green" />
+    <label text="&#129;" x="parent.w-1" y="parent.h" bg="black" fg="green" />
+
+    <pane bgSymbol="&#131;" bgSymbolColor="gray" bg="green" x="2" y="1" width="parent.w-3" height="1" />
+    <pane bgSymbol="&#143;" bgSymbolColor="green" bg="black" x="2" y="parent.h" width="parent.w-3" height="1" />
+    <pane bgSymbol="&#149;" bgSymbolColor="green" bg="black" x="parent.w-1" y="2" width="1" height="parent.h-2" />
+</frame>
