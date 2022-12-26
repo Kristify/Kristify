@@ -1,7 +1,7 @@
 local ctx = ({...})[1]
 local basalt = require("libs/basalt")
 
-local storage = require(fs.combine("libs", "inv"))(ctx.config.storage)
+local storage = ctx.storage
 storage.refreshStorage()
 
 local function searchObject(base, id)

@@ -12,7 +12,7 @@
 
     <label id="_name" x="2" y="2" fg="lime" />
     <label text="Left:" x="3" y="3" fg="gray" />
-    <label text="Meta:" x="3" y="4" fg="gray" />
+    <label text="Name:" x="3" y="4" fg="gray" />
 
     <label id="_stock" x="9" y="3" />
     <label id="_metaname" x="9" y="4" />
