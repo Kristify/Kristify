@@ -1,4 +1,4 @@
-local ctx = ({...})[1]
+local ctx = ({ ... })[1]
 
 local kristly = ctx.kristly
 local utils = ctx.utils
@@ -82,6 +82,9 @@ local function startListening()
         end
       end
 
+    elseif data.type == "KRISTLY-ERROR" then
+      logger:error("Received kristly error: " .. data.error)
+      return
     else
       logger:debug("Ignoring packet: " .. data.type)
     end
