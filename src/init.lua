@@ -50,6 +50,7 @@ local function init(...)
         end
         return false
     end
+
     -- theme
     local col = { white = 0x1, orange = 0x2, magenta = 0x4, lightBlue = 0x8, yellow = 0x10, lime = 0x20, pink = 0x40,
         grey = 0x80, lightGrey = 0x100, cyan = 0x200, purple = 0x400, blue = 0x800, brown = 0x1000, green = 0x2000,
@@ -57,17 +58,17 @@ local function init(...)
     local inferiorcol = col;
     inferiorcol.gray = col.grey;
     inferiorcol.lightGray = col.lightGrey
-    local result = loadLuaFile(fs.combine(sPage,"theme.lua"), { colours = col, colors = inferiorcol })
+    local result = loadLuaFile(fs.combine(sPage, "theme.lua"), { colours = col, colors = inferiorcol })
     if result then
         ctx.theme = result
     end
     -- config
-    result = loadLuaFile(fs.combine(sData,"config.lua"))
+    result = loadLuaFile(fs.combine(sData, "config.lua"))
     if result then
         ctx.config = result
     end
     -- products
-    result = loadLuaFile(fs.combine(sData,"products.lua"))
+    result = loadLuaFile(fs.combine(sData, "products.lua"))
     if result then
         ctx.products = result
     end
@@ -80,12 +81,12 @@ local function init(...)
     })
 
     -- Load scripts
-    ctx.kristly = require(fs.combine("libs","kristly"))
+    ctx.kristly = require(fs.combine("libs", "kristly"))
     ctx.utils = require("utils")
     ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug") })
     ctx.webhooks = require("webhook")
     ctx.speakerLib = require("speaker")
-    ctx.storage = require(fs.combine("libs","inv"))(ctx.config.storage)
+    ctx.storage = require(fs.combine("libs", "inv"))(ctx.config.storage)
 
     return ctx
 end
@@ -116,3 +117,5 @@ parallel.waitForAny(
         execFile(fs.combine(sSrc, "frontend.lua"))
     end
 )
+
+ctx.logger:debug("Something exited (init.lua)")

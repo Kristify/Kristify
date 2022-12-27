@@ -88,7 +88,9 @@ local function startListening()
           speaker:play("error")
         end
       end
-
+    elseif data.type == "KRISTLY-ERROR" then
+      logger:error("Received kristly error: " .. data.error)
+      return
     else
       logger:debug("Ignoring packet: " .. data.type)
     end
@@ -165,8 +167,10 @@ function handleTransaction(transaction)
       transaction.from .. "` bought " .. amount .. "x " .. product.id .. " (" .. transaction.value .. "kst)"
 
   logger:debug("Running webhooks")
+
   for _, webhook in ipairs(config.webhooks) do
     logger:debug("Webhook: ", webhook.type, webhook.URL)
+
     if webhook.type == "discord" then
       webhooks.discord(webhook.URL, message)
     elseif webhook.type == "discord-modern" then
