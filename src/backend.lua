@@ -9,6 +9,13 @@ local speakerLib = ctx.speakerLib
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
+if string.find(_HOST, "CraftOS-PC") then
+  logger:error("CraftOS-PC detected. There is a bug in CraftOS-PC that makes kristify not work. This has been reported to Jack.")
+  return
+end
+
+logger:debug("CraftOS-PC not detected")
+
 local config = ctx.config
 local products = ctx.products
 
