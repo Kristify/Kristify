@@ -89,9 +89,6 @@ local function startListening()
         end
       end
 
-    elseif data.type == "KRISTLY-ERROR" then
-      logger:error("Received kristly error: " .. data.error)
-      return
     else
       logger:debug("Ignoring packet: " .. data.type)
     end
