@@ -37,4 +37,19 @@ function utils.getProduct(products, metaname)
   return false
 end
 
+---Returns a set of keys for a table
+---@param table table The table to inspect
+---@return table keyset A table containing keys for the original table
+function utils.keyset(table)
+  local keyset = {}
+  local n = 0
+
+  for k, v in pairs(table) do
+    n = n + 1
+    keyset[n] = k
+  end
+
+  return keyset
+end
+
 return utils

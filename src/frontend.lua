@@ -2,7 +2,7 @@ local ctx = ({ ... })[1]
 local basalt = require("libs/basalt")
 
 local storage = ctx.storage
-storage.refreshStorage()
+storage.refreshStorage(true)
 
 local function searchObject(base, id)
     local obj = base:getObject(id)

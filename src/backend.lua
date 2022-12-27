@@ -55,7 +55,7 @@ end
 logger:info("Configuration loaded. Indexing chests")
 
 local storage = ctx.storage
-storage.refreshStorage()
+storage.refreshStorage(true)
 logger:info("Chests indexed.")
 
 local ws = kristly.websocket(config.pkey)
@@ -141,8 +141,10 @@ function handleTransaction(transaction)
 
   logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
 
-  local turns = math.ceil(amount / 64 / 16)
-  local lastTurn = amount - ((turns - 1) * 64 * 16)
+  local stackSize = storage.getItem(product.id)
+  print(textutils.serialise(stackSize))
+  local turns = math.ceil(amount / stackSize / 16)
+  local lastTurn = amount - ((turns - 1) * stackSize * 16)
 
   logger:debug("Taking " .. turns .. " turn(s), last one has " .. lastTurn)
 
@@ -154,7 +156,7 @@ function handleTransaction(transaction)
       storage.pushItems(config.self, product.id, lastTurn, nil, nil, { optimal = false })
     else
       logger:debug("Not last turn")
-      storage.pushItems(config.self, product.id, 64 * 16, nil, nil, { optimal = false })
+      storage.pushItems(config.self, product.id, stackSize * 16, nil, nil, { optimal = false })
 
     end
     for i = 1, 16 do

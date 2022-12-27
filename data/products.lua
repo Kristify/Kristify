@@ -23,4 +23,16 @@ return {
 		id = "minecraft:paper",
 		metaname = "ppa",
 	},
+	{
+		displayName = "Fishing Rod",
+		price = 2,
+		id = "minecraft:fishing_rod",
+		metaname = "fish"
+	},
+	{
+		displayName = "Brown Bed",
+		price = 1,
+		id = "minecraft:brown_bed",
+		metaname = "bb"
+	}
 }
