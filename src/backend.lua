@@ -141,8 +141,7 @@ function handleTransaction(transaction)
 
   logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
 
-  local stackSize = storage.getItem(product.id)
-  print(textutils.serialise(stackSize))
+  local stackSize = storage.getItem(product.id).item.maxCount
   local turns = math.ceil(amount / stackSize / 16)
   local lastTurn = amount - ((turns - 1) * stackSize * 16)
 

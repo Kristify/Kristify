@@ -2,7 +2,6 @@ local ctx = ({ ... })[1]
 local basalt = require("libs/basalt")
 
 local storage = ctx.storage
-storage.refreshStorage(true)
 
 local function searchObject(base, id)
     local obj = base:getObject(id)
@@ -106,7 +105,7 @@ base:addThread("_moveSubtitle")
 -- Events
 basalt.onEvent(function(event)
     if event == "kstUpdateProducts" then
-        storage.refreshStorage()
+        storage.refreshStorage(true)
         local body = searchObject(base, "_body")
         -- Clear
         repeat
