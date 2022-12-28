@@ -14,6 +14,10 @@ function speaker:play(event)
     return
   end
 
+  if self.config.speakers == nil then
+    return
+  end
+
   if #self.config.speakers == 0 then
     return
   end

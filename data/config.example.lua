@@ -6,7 +6,7 @@ return {
   storage = {
     ""
   },
-  speaker = {
+  speakers = {
     ""
   },
   self = "",
