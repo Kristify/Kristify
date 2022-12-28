@@ -5,7 +5,7 @@
         <label id="_title_end" text=".kst" font='1' x="1" y="5" fg="lightGray" bg="gray" />
         
         <label id="_watermark" text="" x="1" y="1" bg="gray" fg="lightGray" />
-        <button id="_helpButton" text="" onClick="openHelpDialog" x="parent.w" y="1" width="1" height="1" bg="gray" fg="lightGray" />
+        <!--button id="_helpButton" text="" onClick="openHelpDialog" x="parent.w" y="1" width="1" height="1" bg="gray" fg="lightGray" /-->
         
         <frame x="parent.w/2-parent.w/4-1" y="6" width="parent.w/2+1" height="2">
             <pane bgSymbol="&#143;" bgSymbolColor="gray" bg="white" x="2" y="1" width="parent.w-3" height="1" />
@@ -17,4 +17,9 @@
     </frame>
     <pane bg="black" x="1" y="parent.h" width="parent.w" height="1" />
     <label id="_importantMSG" text="" x="1" y="parent.h" bg="black" fg="white" />
+    <frame id="_navigation" x="2" y="parent.h-1" width="parent.w-2" height="1" bg="gray">
+        <button id="_navBack" onClick="navBack" text=" &#017; " x="parent.w/2-self.w-2" y="1" width="3" height="1" fg="white" bg="green" />
+        <button id="_navNext" onClick="navNext" text=" &#016; " x="parent.w/2+self.w" y="1" width="3" height="1" fg="white" bg="green" />
+        <label id="_curPage" text="" x="parent.w/2" y="1" fg="white" />
+    </frame>
 </frame>

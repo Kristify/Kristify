@@ -1,0 +1,5 @@
+<frame id="_widget" width="parent.w-2" height="1">
+    <pane x="1" y="1" width="parent.w" height="parent.h" bgSymbol="_" bg="lightGray" />
+    <label id="_all" text="%s (%s) : %s " x="1" y="1" fg="black" />
+    <button id="_price" x="parent.w-(self.w-1)" y="1" width="5" height="1" bg="green" fg="white" />
+</frame>

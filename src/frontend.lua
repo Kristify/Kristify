@@ -68,72 +68,179 @@ basalt.setVariable("openHelpDialog", function(self)
         )
 end)
 
--- Create frame
 base = basalt.createFrame()
+
+-- Button events
+local tItems = {}
+local spaceW, spaceH = 1,0
+local page = 1
+local function updateCatalog()
+    local body = searchObject(base, "_body")
+    -- Clear
+    for i=1,math.floor(((spaceW+1)*spaceH)*page-0.9) do
+        local obj = body:getObject("_widget_"..i)
+        body:removeObject(obj)
+    end
+    -- Get size of widget
+    local dummy = body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
+    dummy = dummy:getObject("_widget")
+    local nW, nH = body:getSize()
+    local nSubW, nSubH = dummy:getSize()
+    body:removeObject(dummy)
+    -- Insert
+    spaceW, spaceH = nW/nSubW, nH/nSubH
+    local nX, nY = 0,0
+    for i,item in ipairs(tItems) do
+        body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
+        local widget = body:getObject("_widget")
+            :setPosition(nSubW * nX + 1, nSubH * nY + 1)
+        widget.name = "_widget_" .. i
+
+        -- Adjust data
+        local all = searchObject(widget, "_all")
+        if all then
+            all:setText(all:getValue():format(item.displayName, item.amount, item.metaname))
+        end
+        local name = searchObject(widget, "_name")
+        if name then
+            name:setText(item.displayName)
+        end
+        local amount = searchObject(widget, "_stock")
+        if amount then
+            amount :setText(item.amount)
+        end
+        local metaname = searchObject(widget, "_metaname")
+        if metaname then
+            metaname:setText(item.metaname)
+        end
+
+        local button = searchObject(widget, "_price")
+        local _, h = button:getSize()
+        local btnLabel = item.price .. "kst"
+        button
+            :setText(btnLabel)
+            :setSize(#btnLabel + 2, h)
+        -- Next grid space
+        nX = nX + 1
+        if nX >= spaceW then
+            nX = 0
+            nY = nY + 1
+        end
+    end
+    os.queueEvent("kstUpdated")
+end
+
+basalt.setVariable("navBack", function()
+    local body = searchObject(base, "_body")
+    if body then
+        if page > 1 then
+            local _,nH = body:getSize()
+            body:getScrollAmount()
+            local _,nY = body:getOffset()
+            body:setOffset(0,nY-nH)
+            page = page-1
+            lblPage = searchObject(base, "_curPage")
+            if lblPage then
+                lblPage:setText(""..page)
+            end
+        end
+    end
+end)
+basalt.setVariable("navNext", function()
+    local body = searchObject(base, "_body")
+    if body then
+        basalt.debug("> "..spaceW.." "..spaceH)
+        if page < (#tItems/(spaceW*spaceH)) then
+            local _,nH = body:getSize()
+            body:getScrollAmount()
+            local _,nY = body:getOffset()
+            body:setOffset(0,nY+nH)
+            page = page+1
+            lblPage = searchObject(base, "_curPage")
+            if lblPage then
+                lblPage:setText(""..page)
+            end
+        end
+    end
+end)
+
+-- Create frame
+base
     :setMonitor(ctx.config.monSide)
     :setTheme(ctx.theme)
     :addLayout(fs.combine(ctx.path.page, "index.xml"))
 
 -- Adjust theme
 local title = searchObject(base, "_title")
-    :setText(ctx.config.name)
-local nW = title:getSize()
-local nX = title:getPosition()
+local nW,nX = 51,20
+if title then
+    title:setText(ctx.config.name)
+    nW = title:getSize()
+    nX = title:getPosition()
+end
 
 local titleEnd = searchObject(base, "_title_end")
-local _, nY = titleEnd:getPosition()
-titleEnd:setPosition(nX + nW * title:getFontSize(), nY)
+if titleEnd then
+    local _, nY = titleEnd:getPosition()
+    titleEnd:setPosition(nX + nW * title:getFontSize(), nY)
+end
 
 local watermark = searchObject(base, "_watermark")
-    :setText("Kristify")
+if watermark then
+    watermark:setText("Kristify")
+end
 
 local helpBtn = searchObject(base, "_helpButton")
-    :setText("?")
+if helpBtn then
+    helpBtn:setText("?")
+end
+
+local page = searchObject(base, "_curPage")
+if page then
+    page:setText("1")
+end
+
+local msg = searchObject(base, "_importantMSG")
+if msg then
+    msg:setText("Pay to <metaname>@"..ctx.config.name..".kst for a purchase!")
+end
 
 local subtitle = searchObject(base, "_subtitle")
-
-base:addThread("_moveSubtitle")
-    :start(function()
-        local nW = subtitle:getSize()
-        if #ctx.config.tagline <= nW then
-            subtitle:setText(ctx.config.tagline)
-            return
-        end
-
-        local i, cooldown = 1, 7
-        while true do
-            if cooldown <= 0 then
-                i = i + 1
-                if i > (#ctx.config.tagline) + 5 then
-                    i = 1
-                    cooldown = 7
-                end
-            else
-                cooldown = cooldown - 1
+if subtitle then
+    base:addThread("_moveSubtitle")
+        :start(function()
+            local nW = subtitle:getSize()
+            if #ctx.config.tagline <= nW then
+                subtitle:setText(ctx.config.tagline)
+                return
             end
-            subtitle:setText(ctx.config.tagline:sub(i))
-            sleep(0.2)
-        end
-    end
-    )
 
--- Events
+            local i, cooldown = 1, 7
+            while true do
+                if cooldown <= 0 then
+                    i = i + 1
+                    if i > (#ctx.config.tagline) + 5 then
+                        i = 1
+                        cooldown = 7
+                    end
+                else
+                    cooldown = cooldown - 1
+                end
+                subtitle:setText(ctx.config.tagline:sub(i))
+                sleep(0.2)
+            end
+        end
+    )
+end
+
+-- Event
 basalt.onEvent(function(event)
     if event == "kstUpdateProducts" then
         ctx.logger:debug("Received event: kstUpdateProducts. Will refresh cache")
-
         storage.refreshStorage(true)
-
         os.queueEvent("kristify:storageRefreshed")
-
-        local body = searchObject(base, "_body")
-        -- Clear
-        repeat
-            local obj = body:getObject("_widget")
-            body:removeObject(obj)
-        until not obj
         -- Sort
-        local tItems = {}
+        tItems = {}
         for _, item in ipairs(ctx.products) do
             local amount = storage.getCount(item.id)
             if amount ~= 0 then
@@ -149,49 +256,8 @@ basalt.onEvent(function(event)
         table.sort(tItems, function(a, b)
             return a.amount > b.amount
         end)
-        -- Get size of widget
-        local dummy = body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
-        dummy = dummy:getObject("_widget")
-        local nW, nH = body:getSize()
-        local nSubW, nSubH = dummy:getSize()
-        body:removeObject(dummy)
-        -- Insert
-        local spaceW, spaceH = nW / nSubW - 1, nH / nSubH - 1
-        local nYOff = (spaceH <= 1) and (nH / 2) - (nSubH / 2) or 0
 
-        local nX, nY = 0, 0
-        for i, item in ipairs(tItems) do
-            body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
-            local widget = body:getObject("_widget")
-                :setPosition(nSubW * nX + 1, nSubH * nY + 1 + nYOff)
-            widget.name = "_widget_" .. i
-
-            -- Adjust data
-            local name = searchObject(widget, "_name")
-                :setText(item.displayName)
-
-            local amount = searchObject(widget, "_stock")
-                :setText(item.amount)
-            local metaname = searchObject(widget, "_metaname")
-                :setText(item.metaname)
-
-            local button = searchObject(widget, "_price")
-            local _, h = button:getSize()
-            local btnLabel = item.price .. "kst"
-            button
-                :setText(btnLabel)
-                :setSize(#btnLabel + 2, h)
-
-            -- Next grid space
-            nX = nX + 1
-            if nX > spaceW then
-                nX = 0
-                nY = nY + 1
-                if nY >= spaceH then
-                    break
-                end
-            end
-        end
+        updateCatalog()
     end
 end)
 
