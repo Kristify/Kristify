@@ -15,4 +15,4 @@ No other mods than ComputerCraft ([Tweaked](https://modrinth.com/mod/cc-tweaked)
 
 ## Documentation
 
-Our documentation is hosted on [`kristify.github.io/kristify`](https://kristify.github.io/kristify).
+Our documentation is hosted on [`kristify.github.io`](https://kristify.github.io).
