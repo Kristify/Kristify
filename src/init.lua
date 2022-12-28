@@ -15,6 +15,10 @@ local function init(...)
         data = sData
     }
 
+    -- Logger
+    ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug") })
+
+
     -- [Pages]
     local pages = fs.list(sPage)
     for i = 1, #pages do
@@ -40,12 +44,12 @@ local function init(...)
             f.close()
             local result = loadStr(c, "", env)
             if not result then
-                printError("Could not load \'" .. path .. "\' properly!\n" .. tostring(result))
+                ctx.logger:error("Could not load \'" .. path .. "\' properly!\n" .. tostring(result))
                 sleep(1)
             end
             return result
         else
-            printError("Could not load \'" .. path .. "\'!")
+            ctx.logger:error("Could not load \'" .. path .. "\'!")
             sleep(0.5)
         end
         return false
@@ -83,20 +87,21 @@ local function init(...)
     -- Load scripts
     ctx.kristly = require(fs.combine("libs", "kristly"))
     ctx.utils = require("utils")
-    ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug") })
     ctx.webhooks = require("webhook")
     ctx.speakerLib = require("speaker")
-    ctx.storage = require(fs.combine("libs", "inv"))(ctx.config.storage)
+    ctx.storage = require(fs.combine("libs", "inv"))(ctx.config.storage or {})
 
     return ctx
 end
 
 -- INIT
+term.clear()
+term.setCursorPos(1,1)
 local args = table.pack(...)
 xpcall(function()
     init(table.unpack(args, 1, args.n))
 end, function(err)
-    printError(err)
+    ctx.logger:error(err)
     return
 end)
 
@@ -105,6 +110,7 @@ local function execFile(sPath)
     local script, err = loadfile(sPath, "t", _ENV)
     if not script then
         ctx.logger:error(err)
+        return
     end
     script(ctx)
 end

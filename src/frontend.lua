@@ -1,7 +1,20 @@
 local ctx = ({ ... })[1]
-local basalt = require("libs/basalt")
-
 local storage = ctx.storage
+
+local basalt = {}
+if not fs.exists(fs.combine(ctx.path.src, "lib","basalt")) then
+    local authenticate = _G._GIT_API_KEY and {Authorization = "Bearer ".._G._GIT_API_KEY}
+    local basaltDL,err,errCode = http.get("https://raw.githubusercontent.com/Kristify/kristify/main/src/libs/basalt.lua", authenticate)
+    if not basaltDL then
+        ctx.logger:error("Couldn't load Basalt into memory! Reason: \'"..err.."\' (code "..errCode.getResponseCode()..')')
+        return
+    end
+
+    basalt = load(basaltDL.readAll())()
+    basaltDL.close()
+else
+    basalt = require("basalt")
+end
 
 local function searchObject(base, id)
     local obj = base:getObject(id)

@@ -179,7 +179,8 @@ function abstractInventory(inventories, assumeLimits)
     local deepCacheFunctions = {}
     for _, inventory in pairs(inventories) do
       emptySlotLUT[inventory] = {}
-      for i = 1, (peripheral.call(inventory, "size") or 0) do
+      local size = peripheral.call(inventory, "size") or 0
+      for i = 1, size do
         emptySlotLUT[inventory][i] = true
         local slotnumber = #slotNumberLUT + 1
         slotNumberLUT[slotnumber] = { inventory = inventory, slot = i }
