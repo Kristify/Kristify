@@ -52,11 +52,12 @@ if utils.endsWith(config.name, ".kst") then
   return
 end
 
-logger:info("Configuration loaded. Indexing chests")
+logger:info("Configuration loaded. Waiting for chests to be indexed.")
+
+os.pullEvent("kristify:storageRefreshed")
 
 local storage = ctx.storage
-storage.refreshStorage(true)
-logger:info("Chests indexed.")
+logger:info("Chests indexed according to frontend.")
 
 local ws = kristly.websocket(config.pkey)
 
