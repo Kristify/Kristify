@@ -64,7 +64,7 @@ local ws = kristly.websocket(config.pkey)
 local function refund(pkey, transaction, amountToPay, message, playSound)
   playSound = playSound or true
   local meta = utils.parseCommonmeta(transaction.metadata)
-  local returnTo = meta["meta"]["return"]
+  local returnTo = meta["meta"]["return"] or transaction.from
   logger:debug("Refunding to: " .. returnTo)
   kristly.makeTransaction(pkey, returnTo, amountToPay, message)
 
