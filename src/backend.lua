@@ -83,7 +83,7 @@ local function startListening()
 
           handleTransaction(transaction)
         elseif transaction.sent_name == config.name then
-          logger.info("No metaname found. Refunding.")
+          logger:info("No metaname found. Refunding.")
           kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
             config.messages.noMetaname)
           speaker:play("error")
