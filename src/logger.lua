@@ -5,6 +5,11 @@ local logger = {}
 ---@return table
 function logger:new(o)
   o = o or {} -- create object if user does not provide one
+  if o.log2file ~= nil and o.log2file == true then
+    print("Logging to file is enabled.")
+    o.f = fs.open("/kristify-latest.log", "w")
+  end
+
   setmetatable(o, self)
   self.__index = self
   term.clear()
@@ -32,18 +37,36 @@ end
 ---Print to the terminal with log level `info`
 ---@param ... any
 function logger:info(...)
+
+  if self.log2file == true then
+    self.f.write("\n" .. textutils.serialize(arg))
+    self.f.flush()
+  end
+
   colorPrint(colors.lightGray, "[", colors.green, "INFO", colors.lightGray, "] ", colors.white, table.unpack(arg))
 end
 
 ---Print to the terminal with log level `warn`
 ---@param ... any
 function logger:warn(...)
+
+  if self.log2file == true then
+    self.f.write("\n" .. textutils.serialize(arg))
+    self.f.flush()
+  end
+
   colorPrint(colors.lightGray, "[", colors.orange, "WARN", colors.lightGray, "] ", colors.white, table.unpack(arg))
 end
 
 ---Print to the terminal with log level `error`
 ---@param ... any
 function logger:error(...)
+
+  if self.log2file == true then
+    self.f.write("\n" .. textutils.serialize(arg))
+    self.f.flush()
+  end
+
   colorPrint(colors.lightGray, "[", colors.red, "ERROR", colors.lightGray, "] ", colors.red, table.unpack(arg))
 end
 
@@ -51,6 +74,12 @@ end
 ---@param ... any
 function logger:debug(...)
   if self.debugging ~= true then return end
+
+  if self.log2file == true then
+    self.f.write("\n" .. textutils.serialize(arg))
+    self.f.flush()
+  end
+
   colorPrint(colors.lightGray, "[", colors.gray, "DEBUG", colors.lightGray, "] ", colors.gray, table.unpack(arg))
 end
 

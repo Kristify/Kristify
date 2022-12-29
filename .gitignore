@@ -4,6 +4,13 @@ config.lua
 # .settings
 .settings
 
+# Cloud catcher
+cloud.lua
+
+# Logs
+
+*.log
+
 # Compiled Lua sources
 luac.out
 

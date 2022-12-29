@@ -16,7 +16,8 @@ local function init(...)
     }
 
     -- Logger
-    ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug") })
+    ctx.logger = require("logger"):new({ debugging = settings.get("kristify.debug"),
+        log2file = settings.get("kristify.log2file") })
 
 
     -- [Pages]
@@ -84,11 +85,20 @@ local function init(...)
         type = "boolean"
     })
 
+    settings.define("kristify.log2file", {
+        description = "If kristify should log to a file",
+        default = false,
+        type = "boolean"
+    })
+
     -- Load scripts
     ctx.kristly = require(fs.combine("libs", "kristly"))
     ctx.utils = require("utils")
     ctx.webhooks = require("webhook")
     ctx.speakerLib = require("speaker")
+
+    ctx.logger.debug("Loading in inv lib")
+    ctx.logger.debug("Configured storage: " .. textutils.serialize(ctx.config.storage))
     ctx.storage = require(fs.combine("libs", "inv"))(ctx.config.storage or {})
 
     return ctx
@@ -96,7 +106,7 @@ end
 
 -- INIT
 term.clear()
-term.setCursorPos(1,1)
+term.setCursorPos(1, 1)
 local args = table.pack(...)
 xpcall(function()
     init(table.unpack(args, 1, args.n))
