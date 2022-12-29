@@ -1,5 +1,6 @@
 # Configuration files
 config.lua
+products.lua
 
 # .settings
 .settings
