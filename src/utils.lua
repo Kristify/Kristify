@@ -52,4 +52,36 @@ function utils.keyset(table)
   return keyset
 end
 
+function utils.parseCommonmeta(meta)
+  local domainMatch = "^([%l%d-_]*)@?([%l%d-]+).kst$"
+  local commonMetaMatch = "^(.+)=(.+)$"
+
+  local tbl = { meta = {} }
+
+  for m in meta:gmatch("[^;]+") do
+    if m:match(domainMatch) then
+      -- print("Matched domain")
+
+      local p1, p2 = m:match("([%l%d-_]*)@"), m:match("@?([%l%d-]+).kst")
+      tbl.name = p1
+      tbl.domain = p2
+
+    elseif m:match(commonMetaMatch) then
+      -- print("Matched common meta")
+
+      local p1, p2 = m:match(commonMetaMatch)
+
+      tbl.meta[p1] = p2
+
+    else
+      -- print("Unmatched standard meta")
+
+      table.insert(tbl.meta, m)
+    end
+    -- print(m)
+  end
+  -- print(textutils.serialize(tbl))
+  return tbl
+end
+
 return utils

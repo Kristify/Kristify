@@ -61,6 +61,18 @@ logger:info("Chests indexed according to frontend.")
 
 local ws = kristly.websocket(config.pkey)
 
+local function refund(pkey, transaction, amountToPay, message, playSound)
+  playSound = playSound or true
+  local meta = utils.parseCommonmeta(transaction.metadata)
+  local returnTo = meta["meta"]["return"]
+  logger:debug("Refunding to: " .. returnTo)
+  kristly.makeTransaction(pkey, returnTo, amountToPay, message)
+
+  if playSound then
+    speaker:play("error")
+  end
+end
+
 local function startListening()
   ws:subscribe("transactions")
   logger:info("Subscribed to transactions.")
@@ -84,9 +96,7 @@ local function startListening()
           handleTransaction(transaction)
         elseif transaction.sent_name == config.name then
           logger:info("No metaname found. Refunding.")
-          kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-            config.messages.noMetaname)
-          speaker:play("error")
+          refund(config.pkey, transaction, transaction.value, config.message.noMetaname)
         end
       end
     elseif data.type == "KRISTLY-ERROR" then
@@ -103,19 +113,15 @@ function handleTransaction(transaction)
   local product = utils.getProduct(products, transaction.sent_metaname)
 
   if product == false or product == nil then
-    kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      config.messages.nonexistantItem)
-    logger:debug("Item does not exist.")
-    speaker:play("error")
+    logger:info("Item does not exist. Refunding. Was from: " .. transaction.from)
+    refund(config.pkey, transaction, transaction.value, config.messages.nonexistantItem)
     return
   end
 
 
   if transaction.value < product.price then
     logger:info("Not enough money sent. Refunding.")
-    kristly.makeTransaction(config.pkey, transaction.from, transaction.value,
-      config.messages.notEnoughMoney)
-    speaker:play("error")
+    refund(config.pkey, transaction, transaction.value, config.messages.notEnoughMoney)
     return
   end
 
@@ -126,18 +132,17 @@ function handleTransaction(transaction)
 
   local itemsInStock = storage.getCount(product.id)
   logger:debug("Managed to get stock: " .. itemsInStock)
+
   if amount > itemsInStock then
     logger:info("Not enough in stock. Refunding")
     logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
-    kristly.makeTransaction(config.pkey, transaction.from, amount * product.price,
-      config.messages.notEnoughStock)
-    speaker:play("error")
+    refund(config.pkey, transaction, amount * product.price, config.messages.notEnoughStock)
     return
   end
 
   if change ~= 0 then
     logger:debug("Sending out change")
-    kristly.makeTransaction(config.pkey, transaction.from, change, config.messages.change)
+    refund(config.pkey, transaction, change, config.messages.change, false)
   end
 
   logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
