@@ -88,7 +88,7 @@ local function updateCatalog()
     local nSubW, nSubH = dummy:getSize()
     body:removeObject(dummy)
     -- Insert
-    spaceW, spaceH = nW/nSubW, nH/nSubH
+    spaceW, spaceH = nW/nSubW-0.5, nH/nSubH
     local nX, nY = 0,0
     for i,item in ipairs(tItems) do
         body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
