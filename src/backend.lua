@@ -1,8 +1,10 @@
 local ctx = ({ ... })[1]
 
+local logger = ctx.logger
 local kristly = ctx.kristly
 local utils = ctx.utils
-local logger = ctx.logger
+local config = ctx.config
+local products = ctx.products
 local webhooks = ctx.webhooks
 local speakerLib = ctx.speakerLib
 
@@ -10,56 +12,32 @@ logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
 if string.find(_HOST, "CraftOS-PC", 1, true) then
-  logger:error("CraftOS-PC detected. There is a bug in CraftOS-PC that makes kristify not work. This has been reported to Jack.")
+  logger:error("CraftOS-PC detected. There is a bug in CraftOS-PC that makes kristify not work. This has been reported to the author.")
+  return
+end
+
+if config == nil then
+  logger:error("Config not found! Check documentation for more info.")
   return
 end
 
 logger:debug("CraftOS-PC not detected")
 
-local config = ctx.config
-local products = ctx.products
-
-if config == nil or config.pkey == nil then
-  logger:error("Config not found! Check documentation for more info.")
-  return
-end
-
 local speaker = speakerLib:new({
   config = config
 })
 
-if config.storage == nil or #config.storage == 0 then
-  logger:error("Missing storage chests")
-  speaker:play("error")
-  return
+local function bAssert(condition, errormsg, doSound)
+  doSound = doSound or true
+
+  if condition then
+    logger:error(errormsg)
+    if doSound then
+      speaker:play("error")
+    end
+    error()
+  end
 end
-
-if config.monSide == nil then
-  logger:error("Missing monitor side in config")
-  speaker:play("error")
-  return
-end
-
-if config.self == nil then
-  logger:error("Config does not include self field")
-  speaker:play("error")
-  return
-end
-
-if utils.endsWith(config.name, ".kst") then
-  logger:error("The krist name that is configured either contains `.kst`, which it should not, or is not defined.")
-  speaker:play("error")
-  return
-end
-
-logger:info("Configuration loaded. Waiting for chests to be indexed.")
-
-os.pullEvent("kristify:storageRefreshed")
-
-local storage = ctx.storage
-logger:info("Chests indexed according to frontend.")
-
-local ws = kristly.websocket(config.pkey)
 
 local function refund(pkey, transaction, amountToPay, message, playSound)
   playSound = playSound or true
@@ -72,6 +50,23 @@ local function refund(pkey, transaction, amountToPay, message, playSound)
     speaker:play("error")
   end
 end
+
+bAssert(config.pkey == nil, "Config is missing field `pkey`")
+bAssert(config.storage == nil or #config.storage == 0, "Config is missing field `storage`. Refer to documentation.")
+bAssert(config.monSide == nil, "Config is missing field `monSide`. Refer to documentation.")
+bAssert(config.self == nil, "Config is missing field `self`. Refer to documentation.")
+bAssert(config.name == nil, "Config is missing field `name`. Refer to documentation.")
+bAssert(utils.endsWith(config.name, ".kst"), "The configured krist name ends with .kst. Please remove this.")
+
+logger:info("Configuration loaded. Waiting for chests to be indexed.")
+
+os.pullEvent("kristify:storageRefreshed")
+
+local storage = ctx.storage
+logger:info("Chests indexed according to frontend.")
+
+local ws = kristly.websocket(config.pkey)
+logger:debug("WebSocket started")
 
 local function startListening()
   ws:subscribe("transactions")
