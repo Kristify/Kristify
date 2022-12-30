@@ -96,7 +96,7 @@ local function startListening()
           handleTransaction(transaction)
         elseif transaction.sent_name == config.name then
           logger:info("No metaname found. Refunding.")
-          refund(config.pkey, transaction, transaction.value, config.message.noMetaname)
+          refund(config.pkey, transaction, transaction.value, config.messages.noMetaname)
         end
       end
     elseif data.type == "KRISTLY-ERROR" then
