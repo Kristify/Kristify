@@ -1,4 +1,4 @@
-<frame id="_widget" width="16" height="parent.h">
+<frame id="_widget" width="16" height="7">
     <frame width="16" height="6" y="2">
         <pane bgSymbol=" " bg="lightGray" x="1" y="2" width="parent.w-1" height="parent.h-2" />
         
