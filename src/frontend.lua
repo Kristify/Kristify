@@ -1,22 +1,7 @@
 local ctx = ({ ... })[1]
 local storage = ctx.storage
 
-local basalt = {}
-if not fs.exists(fs.combine(ctx.path.src, "lib", "basalt")) then
-    local authenticate = _G._GIT_API_KEY and { Authorization = "Bearer " .. _G._GIT_API_KEY }
-    local basaltDL, err, errCode = http.get("https://raw.githubusercontent.com/Kristify/kristify/main/src/libs/basalt.lua"
-        , authenticate)
-    if not basaltDL then
-        ctx.logger:error("Couldn't load Basalt into memory! Reason: \'" ..
-            err .. "\' (code " .. errCode.getResponseCode() .. ')')
-        return
-    end
-
-    basalt = load(basaltDL.readAll())()
-    basaltDL.close()
-else
-    basalt = require("basalt")
-end
+local basalt = ctx.basalt
 
 local function searchObject(base, id)
     local obj = base:getObject(id)
@@ -36,12 +21,14 @@ end
 
 -- Button functions
 local base
+--[[
 local bubbles = {}
 basalt.setVariable("openHelpDialog", function(self)
     ctx.logger:info("Opening help dialog")
     local nW = base:getSize()
     local nX, nY = self:getPosition()
     local nSubW = self:getSize()
+
 
     local bubble = base:addLayout(fs.combine(ctx.path.page, "bubble.xml"))
     bubble = searchObject(base, "_bubble")
@@ -67,51 +54,87 @@ basalt.setVariable("openHelpDialog", function(self)
         end
         )
 end)
+]]
+
+local function smartLoadLayout(frame, path)
+    local pathLUA = fs.combine(ctx.path.page, path..".lua")
+    local pathXML = fs.combine(ctx.path.page, path..".xml")
+    if fs.exists(pathLUA) then
+        local file = fs.open(pathLUA, "r")
+        local data = file.readAll()
+        file.close()
+        local func,err = load(data, path, "bt", _ENV)
+        if not func then
+            ctx.logger:error("Could not load layout \'data/"..path..".lua\'! ("..err..")")
+            return
+        end
+        local success,obj = pcall(func,ctx,frame)
+        if not success then
+            ctx.logger:error(obj)
+            return
+        end
+        frame:addObject(obj)
+    elseif fs.exists(pathXML) then
+        frame:addLayout(pathXML)
+    else
+        ctx.logger:error("Layout \'data/"..path.."\' does not exist!")
+    end
+    return frame
+end
 
 base = basalt.createFrame()
 
 -- Button events
 local tItems = {}
-local spaceW, spaceH = 1,0
 local page = 1
 local function updateCatalog()
     local body = searchObject(base, "_body")
+    local nParW,nParH = body:getSize()
     -- Clear
-    for i=1,math.floor(((spaceW+1)*spaceH)*page-0.9) do
-        local obj = body:getObject("_widget_"..i)
-        body:removeObject(obj)
-    end
-    -- Get size of widget
-    local dummy = body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
-    dummy = dummy:getObject("_widget")
-    local nW, nH = body:getSize()
-    local nSubW, nSubH = dummy:getSize()
-    body:removeObject(dummy)
-    -- Insert
-    spaceW, spaceH = nW/nSubW-0.5, nH/nSubH
-    local nX, nY = 0,0
+    local obj = body:getObject("_widget_1")
+    local i=2
+    repeat
+        if obj then
+            body:removeObject(obj)
+        end
+        obj = body:getObject("_widget_"..i)
+        i = i+1
+    until obj == nil
+    basalt.drawFrames()
+    -- Refill
+    local nScreenX, nScreenY = 1,1
     for i,item in ipairs(tItems) do
-        body:addLayout(fs.combine(ctx.path.page, "widget.xml"))
-        local widget = body:getObject("_widget")
-            :setPosition(nSubW * nX + 1, nSubH * nY + 1)
-        widget.name = "_widget_" .. i
+        -- Load widget template
+        smartLoadLayout(body, "widget")
+        local widget = searchObject(body, "_widget")
+        widget.name = (widget.name).."_"..i
 
-        -- Adjust data
-        local all = searchObject(widget, "_all")
-        if all then
-            all:setText(all:getValue():format(item.displayName, item.amount, item.metaname))
+        local nW,nH = widget:getSize()
+
+        local function fill(name,value)
+            value = tostring(value)
+            local obj = searchObject(widget, name)
+            if not obj then return end
+            obj:setValue(value)
+
+            local nX,_ = obj:getPosition()
+            value = tostring(obj:getValue())
+            if #value+nX+1 >= nW then
+                widget:setSize(#value+nX+1, nH)
+                nW,nH = #value+nX+1, nH
+            end
+
+            return obj
         end
-        local name = searchObject(widget, "_name")
-        if name then
-            name:setText(item.displayName)
-        end
-        local amount = searchObject(widget, "_stock")
-        if amount then
-            amount :setText(item.amount)
-        end
-        local metaname = searchObject(widget, "_metaname")
-        if metaname then
-            metaname:setText(item.metaname)
+
+        -- Fill data
+        local name = fill("_name",item.displayName)
+        fill("_stock",item.amount)
+        fill("_metaname",item.metaname)
+
+        -- Name color
+        if type(item.color) == "string" then
+            name:setForeground(colors[item.color])
         end
 
         local button = searchObject(widget, "_price")
@@ -120,55 +143,50 @@ local function updateCatalog()
         button
             :setText(btnLabel)
             :setSize(#btnLabel + 2, h)
-        -- Next grid space
-        nX = nX + 1
-        if nX >= spaceW then
-            nX = 0
-            nY = nY + 1
+
+        widget:setPosition(nScreenX,nScreenY)
+        -- Next Position
+        nScreenX = nScreenX+nW
+        if nScreenX > nParW then
+            nScreenY = nScreenY+nH
+            nScreenX = 1+nW
+            widget:setPosition(1,nScreenY)
         end
     end
-    os.queueEvent("kstUpdated")
 end
 
 basalt.setVariable("navBack", function()
     local body = searchObject(base, "_body")
-    if body then
-        if page > 1 then
-            local _,nH = body:getSize()
-            body:getScrollAmount()
-            local _,nY = body:getOffset()
-            body:setOffset(0,nY-nH)
-            page = page-1
-            lblPage = searchObject(base, "_curPage")
-            if lblPage then
-                lblPage:setText(""..page)
-            end
+    if page > 1 then
+        local _,nH = body:getSize()
+        local _,nY = body:getOffset()
+        body:setOffset(0,nY-nH+1)
+        page = page-1
+        lblPage = searchObject(base, "_curPage")
+        if lblPage then
+            lblPage:setText(""..page)
         end
     end
 end)
 basalt.setVariable("navNext", function()
     local body = searchObject(base, "_body")
-    if body then
-        basalt.debug("> "..spaceW.." "..spaceH)
-        if page < (#tItems/(spaceW*spaceH)) then
-            local _,nH = body:getSize()
-            body:getScrollAmount()
-            local _,nY = body:getOffset()
-            body:setOffset(0,nY+nH)
-            page = page+1
-            lblPage = searchObject(base, "_curPage")
-            if lblPage then
-                lblPage:setText(""..page)
-            end
-        end
+    local nMax = body:getScrollAmount()
+    local _,nH = body:getSize()
+    local _,nY = body:getOffset()
+
+    if nY > nMax then return end
+    body:setOffset(0,nY+nH-1)
+    page = page+1
+    lblPage = searchObject(base, "_curPage")
+    if lblPage then
+        lblPage:setText(""..page)
     end
 end)
 
 -- Create frame
-base
-    :setMonitor(ctx.config.monSide)
+base:setMonitor(ctx.config.monSide)
     :setTheme(ctx.theme)
-    :addLayout(fs.combine(ctx.path.page, "index.xml"))
+smartLoadLayout(base, "index")
 
 -- Adjust theme
 local title = searchObject(base, "_title")
@@ -258,6 +276,7 @@ basalt.onEvent(function(event)
         end)
 
         updateCatalog()
+        os.queueEvent("kstUpdated")
     end
 end)
 

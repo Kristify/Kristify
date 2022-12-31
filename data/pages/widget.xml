@@ -1,7 +1,7 @@
 <frame id="_widget" width="16" height="7">
-    <frame width="16" height="6" y="2">
+    <frame width="parent.w" height="6" y="2">
         <pane bgSymbol=" " bg="lightGray" x="1" y="2" width="parent.w-1" height="parent.h-2" />
-        
+
         <label text="&#135;" x="1" y="1" bg="lightGray" fg="gray" />
         <label text="&#144;" x="parent.w-1" y="1" bg="gray" fg="lightGray" />
         <label text="&#139;" x="1" y="parent.h" bg="gray" fg="lightGray" />

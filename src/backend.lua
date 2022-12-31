@@ -58,6 +58,9 @@ bAssert(config.self == nil, "Config is missing field `self`. Refer to documentat
 bAssert(config.name == nil, "Config is missing field `name`. Refer to documentation.")
 bAssert(utils.endsWith(config.name, ".kst"), "The configured krist name ends with .kst. Please remove this.")
 
+-- Make private keys chars in lowercase so it works for sure
+config.pkey = config.pkey:lower()
+
 logger:info("Configuration loaded. Waiting for chests to be indexed.")
 
 os.pullEvent("kristify:storageRefreshed")
