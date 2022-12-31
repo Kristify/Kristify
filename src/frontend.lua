@@ -260,7 +260,7 @@ basalt.onEvent(function(event)
         -- Sort
         tItems = {}
         for _, item in ipairs(ctx.products) do
-            local amount = storage.getCount(item.id)
+            local amount = storage.getCount(item.id, item.nbt)
             if amount ~= 0 then
                 local newItem = {
                     amount = amount

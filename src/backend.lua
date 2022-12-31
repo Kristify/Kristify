@@ -128,12 +128,12 @@ function handleTransaction(transaction)
 
   logger:debug("Amount: " .. amount .. " Change: " .. change)
 
-  local itemsInStock = storage.getCount(product.id)
+  local itemsInStock = storage.getCount(product.id, product.nbt)
   logger:debug("Managed to get stock: " .. itemsInStock)
 
   if amount > itemsInStock then
     logger:info("Not enough in stock. Refunding")
-    logger:debug("Stock for " .. product.id .. " was " .. itemsInStock .. ", requested " .. amount)
+    logger:debug("Stock for " .. product.displayName .. " was " .. itemsInStock .. ", requested " .. amount)
     refund(config.pkey, transaction, amount * product.price, config.messages.notEnoughStock)
     return
   end
@@ -143,9 +143,9 @@ function handleTransaction(transaction)
     refund(config.pkey, transaction, change, config.messages.change, false)
   end
 
-  logger:info("Dispensing " .. amount .. "x " .. product.id .. " (s).")
+  logger:info("Dispensing " .. amount .. "x " .. product.displayName .. " (s).")
 
-  local stackSize = storage.getItem(product.id).item.maxCount
+  local stackSize = storage.getItem(product.id, product.nbt).item.maxCount
   local turns = math.ceil(amount / stackSize / 16)
   local lastTurn = amount - ((turns - 1) * stackSize * 16)
 
@@ -156,10 +156,10 @@ function handleTransaction(transaction)
     if turns == turn then
       logger:debug("Last turn.")
       logger:debug("Arguments passed: " .. config.self, " | ", product.id, " | ", tostring(lastTurn))
-      storage.pushItems(config.self, product.id, lastTurn, nil, nil, { optimal = false })
+      storage.pushItems(config.self, product.id, lastTurn, nil, product.nbt, { optimal = false })
     else
       logger:debug("Not last turn")
-      storage.pushItems(config.self, product.id, stackSize * 16, nil, nil, { optimal = false })
+      storage.pushItems(config.self, product.id, stackSize * 16, nil, product.nbt, { optimal = false })
 
     end
     for i = 1, 16 do
@@ -169,7 +169,7 @@ function handleTransaction(transaction)
   end
 
   local message = "Kristify: `" ..
-      transaction.from .. "` bought " .. amount .. "x " .. product.id .. " (" .. transaction.value .. "kst)"
+      transaction.from .. "` bought " .. amount .. "x " .. product.displayName .. " (" .. transaction.value .. "kst)"
 
   logger:debug("Running webhooks")
 
@@ -179,7 +179,7 @@ function handleTransaction(transaction)
     if webhook.type == "discord" then
       webhooks.discord(webhook.URL, message)
     elseif webhook.type == "discord-modern" then
-      webhooks.discordModern(webhook.URL, transaction.from, product.id, amount * product.price, transaction.id,
+      webhooks.discordModern(webhook.URL, transaction.from, product.displayName, amount * product.price, transaction.id,
         transaction.to)
     elseif webhook.type == "googleChat" then
       webhooks.googleChat(webhook.URL, message)
