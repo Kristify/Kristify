@@ -14,3 +14,7 @@ A piece of software that let's you create **highly customizable** [Krist](https:
   
 ## Documentation  
 Our documentation is hosted on [`kristify.madefor.cc`](https://kristify.madefor.cc).  
+
+## Example
+![Kristly.kst](https://user-images.githubusercontent.com/53350357/210158377-a3b9c303-22e2-4856-bdc1-1e6a4a4c4855.png)
+*Running Kristify shop with default theme*
