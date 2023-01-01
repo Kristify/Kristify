@@ -35,7 +35,7 @@ end
 ctx.logger:debug("Attatching monitor and loading layout.")
 base = basalt.createFrame()
 local mon = peripheral.wrap(ctx.config.monSide)
-mon.setTextScale(0.5)
+mon.setTextScale(ctx.config.monScale or 0.5)
 
 base:setMonitor(ctx.config.monSide)
     :setTheme(ctx.theme)
