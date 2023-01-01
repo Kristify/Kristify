@@ -3,6 +3,7 @@ return {
   name = "",
   tagline = "",
   monSide = "",
+  monScale = 0.5,
   storage = {
     ""
   },
