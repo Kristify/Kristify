@@ -8,7 +8,7 @@ function speaker:new(o)
 end
 
 ---Plays sounds!
----@param event string The event that happend
+---@param event string The event that happend 
 function speaker:play(event)
   if self.config.sounds[event] == nil then
     return
@@ -23,7 +23,7 @@ function speaker:play(event)
   end
 
   for _, sp in ipairs(self.config.speakers) do
-    pcall(peripheral.call(sp, "playSound", self.config.sounds[event]))
+    pcall(peripheral.call(sp, "playSound", self.config.sounds[event], self.config.sounds.volume or 1))
   end
 end
 

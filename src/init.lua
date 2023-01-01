@@ -115,6 +115,7 @@ local function init(...)
     ctx.utils = require("utils")
     ctx.webhooks = require("webhook")
     ctx.speakerLib = require("speaker")
+    ctx.speakerLib.config = ctx.config
 
     ctx.logger.debug("Loading in inv lib")
     ctx.logger.debug("Configured storage: " .. textutils.serialize(ctx.config.storage))

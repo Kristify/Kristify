@@ -1,8 +1,9 @@
 local ctx = ({ ... })[1]
 local storage = ctx.storage
-
+local speaker = ctx.speakerLib
 local basalt = ctx.basalt
 
+-- Not needed becvause basalt has such a thing already but whatever
 local function searchObject(base, id)
     local obj = base:getObject(id)
     if not obj then
@@ -21,41 +22,6 @@ end
 
 -- Button functions
 local base
---[[
-local bubbles = {}
-basalt.setVariable("openHelpDialog", function(self)
-    ctx.logger:info("Opening help dialog")
-    local nW = base:getSize()
-    local nX, nY = self:getPosition()
-    local nSubW = self:getSize()
-
-
-    local bubble = base:addLayout(fs.combine(ctx.path.page, "bubble.xml"))
-    bubble = searchObject(base, "_bubble")
-    bubbles[#bubbles + 1] = bubble
-    bubble.name = "_bubble" .. #bubble
-
-    bubble:setSize(10, 2)
-    local nBSubW = bubble:getSize()
-    bubble
-        :setPosition(nX + ((nX > nW / 2) and (-(nBSubW + 1)) or (nSubW + 1)), nY)
-        :addThread("_lifetimeTask")
-        :start(function()
-            for _ = 1, 4 do
-                sleep(1)
-            end
-            base:removeObject(bubble)
-            for i, obj in pairs(bubbles) do
-                if obj == bubble then
-                    table.remove(bubbles, i)
-                    break
-                end
-            end
-        end
-        )
-end)
-]]
-
 local function smartLoadLayout(frame, path)
     local pathLUA = fs.combine(ctx.path.page, path..".lua")
     local pathXML = fs.combine(ctx.path.page, path..".xml")
@@ -84,7 +50,7 @@ end
 
 base = basalt.createFrame()
 
--- Button events
+-- Catalog refresh
 local tItems = {}
 local page = 1
 local function updateCatalog()
@@ -137,12 +103,22 @@ local function updateCatalog()
             name:setForeground(colors[item.color])
         end
 
+        -- Price
         local button = searchObject(widget, "_price")
         local _, h = button:getSize()
         local btnLabel = item.price .. "kst"
         button
             :setText(btnLabel)
             :setSize(#btnLabel + 2, h)
+
+        -- Frame clicking
+        widget:onClick(function()
+            local info = searchObject(base, "_importantMSG")
+            if info then
+                info:setText("Pay to "..item.metaname.."@"..ctx.config.name..".kst for a purchase!")
+                speaker:play("click")
+            end
+        end)
 
         widget:setPosition(nScreenX,nScreenY)
         -- Next Position
@@ -155,9 +131,11 @@ local function updateCatalog()
     end
 end
 
+--Button events
 basalt.setVariable("navBack", function()
     local body = searchObject(base, "_body")
     if page > 1 then
+        speaker:play("click")
         local _,nH = body:getSize()
         local _,nY = body:getOffset()
         body:setOffset(0,nY-nH+1)
@@ -175,6 +153,7 @@ basalt.setVariable("navNext", function()
     local _,nY = body:getOffset()
 
     if nY > nMax then return end
+    speaker:play("click")
     body:setOffset(0,nY+nH-1)
     page = page+1
     lblPage = searchObject(base, "_curPage")
@@ -184,11 +163,16 @@ basalt.setVariable("navNext", function()
 end)
 
 -- Create frame
+ctx.logger:debug("Attatching monitor and loading layout.")
+local mon = peripheral.wrap(ctx.config.monSide)
+mon.setTextScale(0.5)
+
 base:setMonitor(ctx.config.monSide)
     :setTheme(ctx.theme)
 smartLoadLayout(base, "index")
 
 -- Adjust theme
+ctx.logger:debug("Adjust theme by config file")
 local title = searchObject(base, "_title")
 local nW,nX = 51,20
 if title then
@@ -254,7 +238,7 @@ end
 -- Event
 basalt.onEvent(function(event)
     if event == "kstUpdateProducts" then
-        ctx.logger:debug("Received event: kstUpdateProducts. Will refresh cache")
+        ctx.logger:debug("Received event: kstUpdateProducts; Refresh cache")
         storage.refreshStorage(true)
         os.queueEvent("kristify:storageRefreshed")
         -- Sort

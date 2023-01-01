@@ -27,6 +27,8 @@ return {
   sounds = {
     started = "minecraft:block.note_block.harp",
     purchase = "minecraft:entity.villager.yes",
-    error = "minecraft:block.anvil.land"
+    error = "minecraft:block.anvil.land",
+    click = "minecraft:block.wooden_button.click_on",
+    volume = 0.6
   }
 }
