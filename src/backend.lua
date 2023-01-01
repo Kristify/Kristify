@@ -39,15 +39,32 @@ local function bAssert(condition, errormsg, doSound)
   end
 end
 
-local function refund(pkey, transaction, amountToPay, message, playSound)
-  playSound = playSound or true
+local function refund(pkey, transaction, amountToPay, message, isError)
+  isError = isError or true
+
   local meta = utils.parseCommonmeta(transaction.metadata)
   local returnTo = meta["meta"]["return"] or transaction.from
   logger:debug("Refunding to: " .. returnTo)
   kristly.makeTransaction(pkey, returnTo, amountToPay, message)
 
-  if playSound then
+  if isError then
     speaker:play("error")
+
+    for _, value in ipairs(config.webhooks) do
+      if utils.tableIncludes(value.events, "invalid") then
+        print("Webhook : Invalid : " .. value.type)
+
+        if value.type == "discord" then
+          webhooks.discord(value.URL,
+            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
+        elseif value.type == "googleChat" then
+          webhooks.googleChat(value.URL,
+            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
+        elseif value.type == "discord-modern" then
+          webhooks.discordModernInvalid(value.URL, returnTo, transaction.id, message)
+        end
+      end
+    end
   end
 end
 
@@ -179,8 +196,12 @@ function handleTransaction(transaction)
     if webhook.type == "discord" then
       webhooks.discord(webhook.URL, message)
     elseif webhook.type == "discord-modern" then
-      webhooks.discordModern(webhook.URL, transaction.from, product.displayName, amount * product.price, transaction.id,
-        transaction.to)
+      webhooks.discordModernPurchase(
+        webhook.URL, transaction.from, product.displayName, amount * product.price,
+        transaction.id,
+        transaction.to
+      )
+
     elseif webhook.type == "googleChat" then
       webhooks.googleChat(webhook.URL, message)
     end

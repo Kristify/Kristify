@@ -20,7 +20,8 @@ return {
   webhooks = {
     {
       type = "discord-modern",
-      url = ""
+      url = "",
+      events = { "purchase", "invalid", "error" }
     }
   },
   sounds = {

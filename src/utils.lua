@@ -52,6 +52,10 @@ function utils.keyset(table)
   return keyset
 end
 
+---Parses commenmeta
+---@param meta string The meta to parse
+---@return table meta A table with metadata
+---@source k.lua
 function utils.parseCommonmeta(meta)
   local domainMatch = "^([%l%d-_]*)@?([%l%d-]+).kst$"
   local commonMetaMatch = "^(.+)=(.+)$"
@@ -82,6 +86,19 @@ function utils.parseCommonmeta(meta)
   end
   -- print(textutils.serialize(tbl))
   return tbl
+end
+
+---Checks if the tabe contains the value
+---@param tbl table The table to check if includes value
+---@param wanted string The string to check if the table includes
+function utils.tableIncludes(tbl, wanted)
+  for _, value in ipairs(tbl) do
+    if value == wanted then
+      return true
+    end
+  end
+
+  return false
 end
 
 return utils
