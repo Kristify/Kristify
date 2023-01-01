@@ -3,23 +3,6 @@ local storage = ctx.storage
 local speaker = ctx.speakerLib
 local basalt = ctx.basalt
 
--- Not needed becvause basalt has such a thing already but whatever
-local function searchObject(base, id)
-    local obj = base:getObject(id)
-    if not obj then
-        local tAll = base:getLastLayout()
-        for _, obj in pairs(tAll) do
-            if obj and obj.getType and obj.getType() == "Frame" then
-                local found = searchObject(obj, id)
-                if found then
-                    return found
-                end
-            end
-        end
-    end
-    return obj
-end
-
 -- Button functions
 local base
 local function smartLoadLayout(frame, path)
@@ -48,17 +31,25 @@ local function smartLoadLayout(frame, path)
     return frame
 end
 
+-- Create frame
+ctx.logger:debug("Attatching monitor and loading layout.")
 base = basalt.createFrame()
+local mon = peripheral.wrap(ctx.config.monSide)
+mon.setTextScale(0.5)
+
+base:setMonitor(ctx.config.monSide)
+    :setTheme(ctx.theme)
+smartLoadLayout(base, "index")
 
 -- Catalog refresh
 local tItems = {}
 local page = 1
 local function updateCatalog()
-    local body = searchObject(base, "_body")
+    local body = base:getDeepObject("_body")
     local nParW,nParH = body:getSize()
     -- Clear
     local obj = body:getObject("_widget_1")
-    local i=2
+    local i=1
     repeat
         if obj then
             body:removeObject(obj)
@@ -66,20 +57,22 @@ local function updateCatalog()
         obj = body:getObject("_widget_"..i)
         i = i+1
     until obj == nil
+
     basalt.drawFrames()
+
     -- Refill
     local nScreenX, nScreenY = 1,1
     for i,item in ipairs(tItems) do
         -- Load widget template
         smartLoadLayout(body, "widget")
-        local widget = searchObject(body, "_widget")
+        local widget = base:getDeepObject("_widget")
         widget.name = (widget.name).."_"..i
 
         local nW,nH = widget:getSize()
 
         local function fill(name,value)
             value = tostring(value)
-            local obj = searchObject(widget, name)
+            local obj = widget:getDeepObject(name)
             if not obj then return end
             obj:setValue(value)
 
@@ -104,7 +97,7 @@ local function updateCatalog()
         end
 
         -- Price
-        local button = searchObject(widget, "_price")
+        local button = widget:getDeepObject("_price")
         local _, h = button:getSize()
         local btnLabel = item.price .. "kst"
         button
@@ -113,7 +106,7 @@ local function updateCatalog()
 
         -- Frame clicking
         widget:onClick(function()
-            local info = searchObject(base, "_importantMSG")
+            local info = base:getDeepObject("_importantMSG")
             if info then
                 info:setText("Pay to "..item.metaname.."@"..ctx.config.name..".kst for a purchase!")
                 speaker:play("click")
@@ -133,21 +126,21 @@ end
 
 --Button events
 basalt.setVariable("navBack", function()
-    local body = searchObject(base, "_body")
+    local body = base:getDeepObject("_body")
     if page > 1 then
         speaker:play("click")
         local _,nH = body:getSize()
         local _,nY = body:getOffset()
         body:setOffset(0,nY-nH+1)
         page = page-1
-        lblPage = searchObject(base, "_curPage")
+        lblPage = base:getDeepObject("_curPage")
         if lblPage then
             lblPage:setText(""..page)
         end
     end
 end)
 basalt.setVariable("navNext", function()
-    local body = searchObject(base, "_body")
+    local body = base:getDeepObject("_body")
     local nMax = body:getScrollAmount()
     local _,nH = body:getSize()
     local _,nY = body:getOffset()
@@ -156,58 +149,52 @@ basalt.setVariable("navNext", function()
     speaker:play("click")
     body:setOffset(0,nY+nH-1)
     page = page+1
-    lblPage = searchObject(base, "_curPage")
+    lblPage = base:getDeepObject("_curPage")
     if lblPage then
         lblPage:setText(""..page)
     end
 end)
 
--- Create frame
-ctx.logger:debug("Attatching monitor and loading layout.")
-local mon = peripheral.wrap(ctx.config.monSide)
-mon.setTextScale(0.5)
-
-base:setMonitor(ctx.config.monSide)
-    :setTheme(ctx.theme)
-smartLoadLayout(base, "index")
-
 -- Adjust theme
 ctx.logger:debug("Adjust theme by config file")
-local title = searchObject(base, "_title")
+local title = base:getDeepObject("_title")
+local factor = 1
 local nW,nX = 51,20
 if title then
+    factor = title:getFontSize()
     title:setText(ctx.config.name)
     nW = title:getSize()
     nX = title:getPosition()
+    basalt.drawFrames()
 end
 
-local titleEnd = searchObject(base, "_title_end")
+local titleEnd = base:getDeepObject("_title_end")
 if titleEnd then
     local _, nY = titleEnd:getPosition()
-    titleEnd:setPosition(nX + nW * title:getFontSize(), nY)
+    titleEnd:setPosition(nX + (math.floor(nW)*factor*1.5), nY)
 end
 
-local watermark = searchObject(base, "_watermark")
+local watermark = base:getDeepObject("_watermark")
 if watermark then
     watermark:setText("Kristify")
 end
 
-local helpBtn = searchObject(base, "_helpButton")
+local helpBtn = base:getDeepObject("_helpButton")
 if helpBtn then
     helpBtn:setText("?")
 end
 
-local page = searchObject(base, "_curPage")
+local page = base:getDeepObject("_curPage")
 if page then
     page:setText("1")
 end
 
-local msg = searchObject(base, "_importantMSG")
+local msg = base:getDeepObject("_importantMSG")
 if msg then
     msg:setText("Pay to <metaname>@"..ctx.config.name..".kst for a purchase!")
 end
 
-local subtitle = searchObject(base, "_subtitle")
+local subtitle = base:getDeepObject("_subtitle")
 if subtitle then
     base:addThread("_moveSubtitle")
         :start(function()
@@ -234,6 +221,7 @@ if subtitle then
         end
     )
 end
+os.queueEvent("kristify:IndexLoaded")
 
 -- Event
 basalt.onEvent(function(event)
@@ -260,7 +248,7 @@ basalt.onEvent(function(event)
         end)
 
         updateCatalog()
-        os.queueEvent("kstUpdated")
+        os.queueEvent("kristify:CatalogUpdated")
     end
 end)
 
