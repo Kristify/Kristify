@@ -522,9 +522,9 @@ if not http then
           fs.makeDir("startup")
           file = fs.open(fs.combine("startup","kristify.lua"),'w')
         end
+        file.write(script)
+        file.close()
       end
-      file.write(script)
-      file.close()
   
       basalt.stopUpdate()
     end)
