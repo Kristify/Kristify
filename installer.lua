@@ -527,7 +527,8 @@ if not http then
       file.write(script)
       file.close()
   
-      os.queueEvent("terminate")
+      basalt.stopUpdate()
     end)
   
   basalt.autoUpdate()
+return pathToInstall
