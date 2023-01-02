@@ -196,8 +196,21 @@ if not http then
     end
   
     downloadItems(tree,pathToInstall)
-    downloadBlob("https://raw.githubusercontent.com/Kristify/Kristify/main/kristify.lua", "/kristify.lua")
     
+    local response,sErr,errResponse = http.get(("https://raw.githubusercontent.com/Kristify/Kristify/main/kristify.lua", authenticate)
+      if not httpError(response,sErr,errResponse) then
+        return false
+      end
+      
+      local sData = response.readAll()
+      response.close()
+  
+       sData  = sData:gsub("local installation = \"kristify\"", "local installation = \""..pathToInstall.."\"")
+        
+      local file = fs.open("/kristify.lua", 'w')
+      file.write(sData)
+      file.close()
+   
     for _=1,3 do
       status:addLine("")
     end
