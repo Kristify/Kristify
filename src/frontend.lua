@@ -194,32 +194,34 @@ if msg then
     msg:setText("Pay to <metaname>@"..ctx.config.name..".kst for a purchase!")
 end
 
+-- Subtitle scrolling/repositioning
 local subtitle = base:getDeepObject("_subtitle")
+local scroller = function() while true do sleep(10) end end
 if subtitle then
-    base:addThread("_moveSubtitle")
-        :start(function()
-            local nW = subtitle:getSize()
-            if #ctx.config.tagline <= nW then
-                subtitle:setText(ctx.config.tagline)
-                return
-            end
-
-            local i, cooldown = 1, 7
-            while true do
-                if cooldown <= 0 then
-                    i = i + 1
-                    if i > (#ctx.config.tagline) + 5 then
-                        i = 1
-                        cooldown = 7
-                    end
-                else
-                    cooldown = cooldown - 1
-                end
-                subtitle:setText(ctx.config.tagline:sub(i))
-                sleep(0.2)
-            end
+    scroller = function()
+        local nW,nH = subtitle:getSize()
+        if #(ctx.config.tagline)-5 <= nW*nH then
+            subtitle:setText(ctx.config.tagline)
+            local _,nY = subtitle:getPosition()
+            subtitle:setPosition("(parent.w/2)-(self.w/2)",nY)
+            while true do sleep(10) end
         end
-    )
+
+        local i, cooldown = 1, 7
+        while true do
+            if cooldown <= 0 then
+                i = i + 1
+                if i > (#ctx.config.tagline) + 5 then
+                    i = 1
+                    cooldown = 7
+                end
+            else
+                cooldown = cooldown - 1
+            end
+            subtitle:setText((ctx.config.tagline):sub(i))
+            sleep(0.12)
+        end
+    end
 end
 os.queueEvent("kristify:IndexLoaded")
 
@@ -249,8 +251,16 @@ basalt.onEvent(function(event)
 
         updateCatalog()
         os.queueEvent("kristify:CatalogUpdated")
+    elseif event == "kristify:exit" then
+        basalt.stopUpdate()
+        mon.clear()
     end
 end)
 
 os.queueEvent("kstUpdateProducts")
-basalt.autoUpdate(base)
+parallel.waitForAny(
+    function()
+        basalt.autoUpdate(base)
+    end,
+    scroller
+)
