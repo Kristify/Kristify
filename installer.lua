@@ -197,7 +197,7 @@ if not http then
   
     downloadItems(tree,pathToInstall)
     
-    local response,sErr,errResponse = http.get(("https://raw.githubusercontent.com/Kristify/Kristify/main/kristify.lua", authenticate)
+    local response,sErr,errResponse = http.get("https://raw.githubusercontent.com/Kristify/Kristify/main/kristify.lua", authenticate)
       if not httpError(response,sErr,errResponse) then
         return false
       end
