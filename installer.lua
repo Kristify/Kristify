@@ -196,7 +196,8 @@ if not http then
     end
   
     downloadItems(tree,pathToInstall)
-  
+    downloadBlob("https://raw.githubusercontent.com/Kristify/Kristify/main/kristify.lua", "/kristify.lua")
+    
     for _=1,3 do
       status:addLine("")
     end
@@ -512,8 +513,8 @@ if not http then
     :setBackground(colors.green)
     :setForeground(colors.white)
     :onClick(function()
-      local script = "shell.openTab( \""..fs.combine(pathToInstall,"src","init.lua").."\" )"
-      local file = "kristify.lua"
+      local script = "shell.run(\"kristify.lua\")"
+      local file = "startKristify.lua"
       if checkbox:getValue() then
         if fs.exists("/startup.lua") then
           file = fs.open("/startup.lua",'a')
@@ -521,8 +522,6 @@ if not http then
           fs.makeDir("startup")
           file = fs.open(fs.combine("startup","kristify.lua"),'w')
         end
-      else
-        file = fs.open(file, 'w')
       end
       file.write(script)
       file.close()
