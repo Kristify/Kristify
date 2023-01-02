@@ -159,6 +159,7 @@ elseif tArgs[1] == "--version" or tArgs[1] == "-v" then
 elseif tArgs[1] == "--update" or tArgs[1] == "-u" then
   local path = fs.combine(installation,"data")
   if fs.exists(path) then
+    fs.delete(".kristify_data_backup")
     fs.copy(path, ".kristify_data_backup")
   end
 
@@ -182,6 +183,7 @@ elseif tArgs[1] == "--update" or tArgs[1] == "-u" then
   if fs.exists(".kristify_data_backup") then
     fs.delete(fs.combine(path,"data"))
     fs.copy(".kristify_data_backup",fs.combine(path,"data"))
+    fs.delete(".kristify_data_backup")
   end
 
 elseif tArgs[1] == "--storage" or tArgs[1] == "-s" then
