@@ -8,6 +8,8 @@ local products = ctx.products
 local webhooks = ctx.webhooks
 local speakerLib = ctx.speakerLib
 
+local pulseID = -1
+
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
@@ -93,33 +95,65 @@ local function startListening()
   logger:info("Subscribed to transactions.")
 
   speaker:play("started")
+  if config.redstonePulse.delay ~= nil and #config.redstonePulse.sides ~= nil then
+    logger:debug("Starting redstone timer")
+    pulseID = os.startTimer(config.redstonePulse.delay)
+    logger:debug("Timer ID is: " .. pulseID)
+  end
 
   while true do
-    local _, data = os.pullEvent("kristly")
+    local e, data = os.pullEvent()
 
-    if data.type == "keepalive" then
-      logger:debug("Keepalive packet")
-    elseif data.type == "event" then
-      logger:debug("Krist event: " .. data.event)
-
-      if data.event == "transaction" then
-        local transaction = data.transaction
-
-        if transaction.sent_name == config.name and transaction.sent_metaname ~= nil then
-          logger:info("Received transaction to: " .. transaction.sent_metaname .. "@" .. transaction.sent_name .. ".kst")
-
-          handleTransaction(transaction)
-        elseif transaction.sent_name == config.name then
-          logger:info("No metaname found. Refunding.")
-          refund(config.pkey, transaction, transaction.value, config.messages.noMetaname)
-        end
-      end
-    elseif data.type == "KRISTLY-ERROR" then
-      logger:error("Received kristly error: " .. data.error)
-      return
-    else
-      logger:debug("Ignoring packet: " .. data.type)
+    if e == "kristly" then
+      kristlyEvent(data)
+    elseif e == "timer" then
+      timerEvent(data)
     end
+  end
+end
+
+function timerEvent(id)
+  if pulseID == id then
+    redstonePulse()
+  end
+end
+
+function redstonePulse()
+  for index, pulse in ipairs(config.redstonePulse.sides) do
+    local current = rs.getAnalogOutput(pulse.side)
+    if current == nil or current == 0 then
+      rs.setAnalogOutput(pulse.side, 15)
+    else
+      rs.setAnalogOutput(pulse.side, 0)
+    end
+  end
+
+  pulseID = os.startTimer(config.redstonePulse.delay)
+end
+
+function kristlyEvent(data)
+  if data.type == "keepalive" then
+    logger:debug("Keepalive packet")
+  elseif data.type == "event" then
+    logger:debug("Krist event: " .. data.event)
+
+    if data.event == "transaction" then
+      local transaction = data.transaction
+
+      if transaction.sent_name == config.name and transaction.sent_metaname ~= nil then
+        logger:info("Received transaction to: " .. transaction.sent_metaname .. "@" .. transaction.sent_name .. ".kst")
+
+        handleTransaction(transaction)
+      elseif transaction.sent_name == config.name then
+        logger:info("No metaname found. Refunding.")
+        refund(config.pkey, transaction, transaction.value, config.messages.noMetaname)
+      end
+    end
+  elseif data.type == "KRISTLY-ERROR" then
+    logger:error("Received kristly error: " .. data.error)
+    return
+  else
+    logger:debug("Ignoring packet: " .. data.type)
   end
 end
 

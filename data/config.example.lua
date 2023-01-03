@@ -10,6 +10,12 @@ return {
   speakers = {
     ""
   },
+  redstonePulse = {
+    {
+      delay = 3,
+      side = "right",
+    }
+  },
   self = "",
   messages = {
     noMetaname      = "message=No metaname found! Refunding.",
