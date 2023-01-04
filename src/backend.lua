@@ -47,6 +47,7 @@ bAssert(config.monSide == nil, "Config is missing field `monSide`. Refer to docu
 bAssert(config.self == nil, "Config is missing field `self`. Refer to documentation.")
 bAssert(config.name == nil, "Config is missing field `name`. Refer to documentation.")
 bAssert(utils.endsWith(config.name, ".kst"), "The configured krist name ends with .kst. Please remove this.")
+bAssert(not utils.endsWith(config.pkey, "-000"), "The configured krist privatekey is not in the correct format. It should be in kristwallet. If you are using KristWeb you can go to Wallets -> find your wallet -> Press \"..\" -> Wallet info -> Private key -> Reveal")
 
 if config.messages == nil then
   config.messages = {
