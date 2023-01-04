@@ -41,41 +41,24 @@ local function bAssert(condition, errormsg, doSound)
   end
 end
 
-local function refund(pkey, transaction, amountToPay, message, isError)
-  isError = isError or true
-
-  local meta = utils.parseCommonmeta(transaction.metadata)
-  local returnTo = meta["meta"]["return"] or transaction.from
-  logger:debug("Refunding to: " .. returnTo)
-  kristly.makeTransaction(pkey, returnTo, amountToPay, message)
-
-  if isError then
-    speaker:play("error")
-
-    for _, value in ipairs(config.webhooks) do
-      if utils.tableIncludes(value.events, "invalid") then
-        print("Webhook : Invalid : " .. value.type)
-
-        if value.type == "discord" then
-          webhooks.discord(value.URL,
-            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
-        elseif value.type == "googleChat" then
-          webhooks.googleChat(value.URL,
-            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
-        elseif value.type == "discord-modern" then
-          webhooks.discordModernInvalid(value.URL, returnTo, transaction.id, message)
-        end
-      end
-    end
-  end
-end
-
 bAssert(config.pkey == nil, "Config is missing field `pkey`")
 bAssert(config.storage == nil or #config.storage == 0, "Config is missing field `storage`. Refer to documentation.")
 bAssert(config.monSide == nil, "Config is missing field `monSide`. Refer to documentation.")
 bAssert(config.self == nil, "Config is missing field `self`. Refer to documentation.")
 bAssert(config.name == nil, "Config is missing field `name`. Refer to documentation.")
 bAssert(utils.endsWith(config.name, ".kst"), "The configured krist name ends with .kst. Please remove this.")
+
+if config.messages == nil then
+  config.messages = {
+    noMetaname      = "message=No metaname found! Refunding.",
+    nonexistantItem = "message=The item you requested is not available for purchase",
+    notEnoughMoney  = "message=Insufficient amount of krist sent.",
+    notEnoughStock  = "message=We don't have that much stock!",
+    change          = "message=Here is your change! Thanks for using our shop."
+  }
+
+  logger:info("Message field not found in config. Defaulting to default values.")
+end
 
 -- Make private keys chars in lowercase so it works for sure
 config.pkey = config.pkey:lower()
@@ -95,7 +78,7 @@ local function startListening()
   logger:info("Subscribed to transactions.")
 
   speaker:play("started")
-  if config.redstonePulse.delay ~= nil and #config.redstonePulse.sides ~= nil then
+  if config.redstonePulse ~= nil and config.redstonePulse.delay ~= nil and #config.redstonePulse.sides ~= nil then
     logger:debug("Starting redstone timer")
     pulseID = os.startTimer(config.redstonePulse.delay)
     logger:debug("Timer ID is: " .. pulseID)
@@ -129,6 +112,35 @@ function redstonePulse()
   end
 
   pulseID = os.startTimer(config.redstonePulse.delay)
+end
+
+local function refund(pkey, transaction, amountToPay, message, isError)
+  isError = isError or true
+
+  local meta = utils.parseCommonmeta(transaction.metadata)
+  local returnTo = meta["meta"]["return"] or transaction.from
+  logger:debug("Refunding to: " .. returnTo)
+  kristly.makeTransaction(pkey, returnTo, amountToPay, message)
+
+  if isError then
+    speaker:play("error")
+
+    for _, value in ipairs(config.webhooks) do
+      if utils.tableIncludes(value.events, "invalid") then
+        print("Webhook : Invalid : " .. value.type)
+
+        if value.type == "discord" then
+          webhooks.discord(value.URL,
+            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
+        elseif value.type == "googleChat" then
+          webhooks.googleChat(value.URL,
+            "Invalid purchase by `" .. returnTo .. "`. Refunding with meta: `" .. message .. "`.")
+        elseif value.type == "discord-modern" then
+          webhooks.discordModernInvalid(value.URL, returnTo, transaction.id, message)
+        end
+      end
+    end
+  end
 end
 
 function kristlyEvent(data)
