@@ -1,22 +1,47 @@
+-- This is a example config. Items not labeled with `Required.` at the end of the comment, are not required, and can be removed.
+
 return {
+  -- Privatkey in kristwallet format. Should end in -000. Do not share this with anyone. Required.
   pkey = "",
+
+  -- The krist name you want to use for the shop. The need for this will be removed later on. Required.
   name = "",
+
+  -- The networkID of your turtle. To get this click the modem your turtle is connected to.
+  self = "",
+
+  -- The tagline for your shop! This is a string, and is optional. Your theme is able to get this field.
   tagline = "",
+
+  -- Where your monitor is located. This can either be a side releative from the turtle, or a network ID. Required.
   monSide = "",
+
+  -- The scale you want on your monitor. 1 is normal size, 0.5 is half the sise. Defaults to 0.5.
   monScale = 0.5,
+
+  -- A tablearray of storage units. This is parsed by AbstractInvLib. Required.
   storage = {
     ""
   },
+
+  -- A tablearray of speakers. This can in the format of network ID or adjectent peripheral. Defaults to no speakers
   speakers = {
     ""
   },
+
+  -- Redstone pulses. This can be used with forexample a redstone lamp. The redstone item must be adjectent to the turtle.
   redstonePulse = {
-    {
-      delay = 3,
-      side = "right",
+
+    -- The delay in seconds between the redstone switching on/off.
+    delay = 3,
+
+    -- A tablearray of sides to have redstone output on.
+    sides = {
+      "right",
     }
   },
-  self = "",
+
+  -- A table of messages that are sent along with different refunds.
   messages = {
     noMetaname      = "message=No metaname found! Refunding.",
     nonexistantItem = "message=The item you requested is not available for purchase",
@@ -24,13 +49,22 @@ return {
     notEnoughStock  = "message=We don't have that much stock!",
     change          = "message=Here is your change! Thanks for using our shop."
   },
+
+  -- A tablearray of messages
   webhooks = {
     {
+      -- The type of webhook. Can be: discord-modern, discord, googleChat
       type = "discord-modern",
+
+      -- The webhook URL
       url = "",
+
+      -- The events that the webhook should trigger on
       events = { "purchase", "invalid", "error" }
     }
   },
+
+  -- A table of sound effects that are played on events.
   sounds = {
     started = "minecraft:block.note_block.harp",
     purchase = "minecraft:entity.villager.yes",
