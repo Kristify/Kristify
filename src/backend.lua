@@ -236,20 +236,22 @@ function handleTransaction(transaction)
 
   logger:debug("Running webhooks")
 
-  for _, webhook in ipairs(config.webhooks) do
-    logger:debug("Webhook: ", webhook.type, webhook.URL)
+  if config.webhooks ~= nil then
+    for _, webhook in ipairs(config.webhooks) do
+      logger:debug("Webhook: ", webhook.type, webhook.URL)
 
-    if webhook.type == "discord" then
-      webhooks.discord(webhook.URL, message)
-    elseif webhook.type == "discord-modern" then
-      webhooks.discordModernPurchase(
-        webhook.URL, transaction.from, product.displayName, amount * product.price,
-        transaction.id,
-        transaction.to
-      )
+      if webhook.type == "discord" then
+        webhooks.discord(webhook.URL, message)
+      elseif webhook.type == "discord-modern" then
+        webhooks.discordModernPurchase(
+          webhook.URL, transaction.from, product.displayName, amount * product.price,
+          transaction.id,
+          transaction.to
+        )
 
-    elseif webhook.type == "googleChat" then
-      webhooks.googleChat(webhook.URL, message)
+      elseif webhook.type == "googleChat" then
+        webhooks.googleChat(webhook.URL, message)
+      end
     end
   end
 
