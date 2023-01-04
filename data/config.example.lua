@@ -57,7 +57,7 @@ return {
       type = "discord-modern",
 
       -- The webhook URL
-      url = "",
+      URL = "",
 
       -- The events that the webhook should trigger on
       events = { "purchase", "invalid", "error" }
