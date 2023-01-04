@@ -119,12 +119,12 @@ function timerEvent(id)
 end
 
 function redstonePulse()
-  for index, pulse in ipairs(config.redstonePulse.sides) do
-    local current = rs.getAnalogOutput(pulse.side)
+  for index, s in ipairs(config.redstonePulse.sides) do
+    local current = rs.getAnalogOutput(s)
     if current == nil or current == 0 then
-      rs.setAnalogOutput(pulse.side, 15)
+      rs.setAnalogOutput(s, 15)
     else
-      rs.setAnalogOutput(pulse.side, 0)
+      rs.setAnalogOutput(s, 0)
     end
   end
 
