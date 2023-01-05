@@ -6,6 +6,7 @@ local sPage = fs.combine(sData, "pages")
 
 local ctx
 
+local nErrors = 0
 local function init(...)
     -- [Context]
     ctx = { products = {}, theme = {}, config = {}, pages = {} }
@@ -114,6 +115,62 @@ local function init(...)
     ctx.kristly = require(fs.combine("libs", "kristly"))
     ctx.utils = require("utils")
     ctx.webhooks = require("webhook")
+
+    -- Check errors
+    local function bAssert(condition, errormsg)
+      if condition then
+        ctx.logger:error(errormsg)
+        nErrors = nErrors+1
+        return false
+      end
+      return true
+    end
+    
+    local function configExpect(name, typ)
+        local curTyp = type(ctx.config[name])
+        if curTyp ~= typ then
+            ctx.logger:error("Bad value for \'"..name.."\' in config; Expected \'"..typ.."\', got \'"..curTyp.."\'.")
+            nErrors = nErrors+1
+            return false
+        elseif curTyp == "string" and ctx.config[name] == "" then
+            ctx.logger:warn("Value \'"..name.."\' in config should not be empty.")
+
+        end
+        return true
+    end
+    
+    if configExpect("pkey", "string") then
+        bAssert(not ctx.utils.endsWith(ctx.config.pkey or "", "-000"), "The given krist privatekey is not in the correct format. It must be in KRISTWALLET. Via KristWeb: Go to Wallets -> find your wallet -> Press \"...\" -> Wallet info -> Private key -> Reveal")
+    end
+    if configExpect("name", "string") then
+        bAssert(ctx.utils.endsWith(ctx.config.name or "", ".kst"), "Remove \'.kst\' from the name.")
+    end
+    configExpect("webhooks", "table")
+    configExpect("sounds", "table")
+
+    local modem = peripheral.find("modem")
+    if not modem then
+       ctx.logger:error("Kristify is not connected to a network! (aka. wired modem)")
+    elseif type(ctx.config.self) == "string" and modem.getNameLocal() ~= (ctx.config.self or "") then
+        ctx.logger:error("Given turtle in config does not exist!")
+    else configExpect("self", "string")
+    end
+
+    if configExpect("storage", "table") then
+        bAssert(#ctx.config.storage==0 or ctx.config.storage[1] == "", "Storage table in config is empty or invalid!")
+        for _,inv in pairs(ctx.config.storage) do
+            if not peripheral.wrap(inv) then
+                ctx.logger:error("Inventory \'"..inv.."\' does not exist!")
+                nErrors = nErrors+1
+            end
+        end
+    end
+    if configExpect("monSide", "string") then
+      bAssert(not peripheral.wrap(ctx.config.monSide), "Given monitor side does not exist!")
+    end
+    
+
+    -- Load libs, related to peripherals
     ctx.speakerLib = require("speaker")
     ctx.speakerLib.config = ctx.config
 
@@ -132,7 +189,6 @@ xpcall(function()
     init(table.unpack(args, 1, args.n))
 end, function(err)
     ctx.logger:error(err)
-    return
 end)
 
 -- MAIN
@@ -140,18 +196,33 @@ local function execFile(sPath)
     local script, err = loadfile(sPath, "t", _ENV)
     if not script then
         ctx.logger:error(err)
+        nErrors = nErrors+1
         return
     end
-    script(ctx)
+    local result,output = pcall(script, ctx)
+    if not result then
+        if output == "terminated" then
+            -- Close websockets
+            return
+        end
+        ctx.logger:error(output)
+        nErrors = nErrors+1
+    end
 end
 
-parallel.waitForAny(
-    function()
-        execFile(fs.combine(sSrc, "backend.lua"))
-    end,
-    function()
-        execFile(fs.combine(sSrc, "frontend.lua"))
-    end
-)
+if nErrors == 0 then
+    parallel.waitForAny(
+        function()
+            execFile(fs.combine(sSrc, "backend.lua"))
+        end,
+        function()
+            execFile(fs.combine(sSrc, "frontend.lua"))
+        end
+    )
+end
 
-ctx.logger:debug("Something exited (init.lua)")
+if nErrors > 0 then
+    ctx.logger:warn("\'"..nErrors.."\' error(s). Press any key to exit.")
+    sleep(0.5)
+    os.pullEvent("key")
+end

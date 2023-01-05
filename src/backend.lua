@@ -29,26 +29,6 @@ local speaker = speakerLib:new({
   config = config
 })
 
-local function bAssert(condition, errormsg, doSound)
-  doSound = doSound or true
-
-  if condition then
-    logger:error(errormsg)
-    if doSound then
-      speaker:play("error")
-    end
-    error()
-  end
-end
-
-bAssert(config.pkey == nil, "Config is missing field `pkey`")
-bAssert(config.storage == nil or #config.storage == 0, "Config is missing field `storage`. Refer to documentation.")
-bAssert(config.monSide == nil, "Config is missing field `monSide`. Refer to documentation.")
-bAssert(config.self == nil, "Config is missing field `self`. Refer to documentation.")
-bAssert(config.name == nil, "Config is missing field `name`. Refer to documentation.")
-bAssert(utils.endsWith(config.name, ".kst"), "The configured krist name ends with .kst. Please remove this.")
-bAssert(not utils.endsWith(config.pkey, "-000"), "The configured krist privatekey is not in the correct format. It should be in kristwallet. If you are using KristWeb you can go to Wallets -> find your wallet -> Press \"..\" -> Wallet info -> Private key -> Reveal")
-
 if config.messages == nil then
   config.messages = {
     noMetaname      = "message=No metaname found! Refunding.",

@@ -197,16 +197,9 @@ end
 -- Subtitle scrolling/repositioning
 local subtitle = base:getDeepObject("_subtitle")
 local scroller = function() while true do sleep(10) end end
-if subtitle then
+local nW,nH = subtitle:getSize()
+if subtitle and nH > 1 and #(ctx.config.tagline) >= nW then
     scroller = function()
-        local nW,nH = subtitle:getSize()
-        if #(ctx.config.tagline)-5 <= nW*nH then
-            subtitle:setText(ctx.config.tagline)
-            local _,nY = subtitle:getPosition()
-            subtitle:setPosition("(parent.w/2)-(self.w/2)",nY)
-            while true do sleep(10) end
-        end
-
         local i, cooldown = 1, 7
         while true do
             if cooldown <= 0 then
@@ -222,6 +215,8 @@ if subtitle then
             sleep(0.12)
         end
     end
+else
+    subtitle:setText((' '):rep(nW/2-(#ctx.config.tagline)/2)..ctx.config.tagline)
 end
 os.queueEvent("kristify:IndexLoaded")
 
