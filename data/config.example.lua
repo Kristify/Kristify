@@ -1,10 +1,11 @@
 -- This is a example config. Items not labeled with `Required.` at the end of the comment, are not required, and can be removed.
 
 return {
-  -- Privatkey in kristwallet format. Should end in -000. Do not share this with anyone. Required.
+  -- Krist private key in raw format. Do not share this with anyone. Required.
+  -- If you're using Kristwallet format, this should typically be lowercase and end in -000.
   pkey = "",
 
-  -- The krist name you want to use for the shop. The need for this will be removed later on. Required.
+  -- The Krist name you want to use for the shop. The need for this will be removed later on. Required.
   name = "",
 
   -- The networkID of your turtle. To get this click the modem your turtle is connected to.

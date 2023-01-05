@@ -41,9 +41,6 @@ if config.messages == nil then
   logger:info("Message field not found in config. Defaulting to default values.")
 end
 
--- Make private keys chars in lowercase so it works for sure
-config.pkey = config.pkey:lower()
-
 logger:info("Configuration loaded. Waiting for chests to be indexed.")
 
 os.pullEvent("kristify:storageRefreshed")
