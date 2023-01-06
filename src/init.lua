@@ -139,9 +139,7 @@ local function init(...)
         return true
     end
     
-    if configExpect("pkey", "string") then
-        bAssert(not ctx.utils.endsWith(ctx.config.pkey or "", "-000"), "The given krist privatekey is not in the correct format. It must be in KRISTWALLET. Via KristWeb: Go to Wallets -> find your wallet -> Press \"...\" -> Wallet info -> Private key -> Reveal")
-    end
+    configExpect("pkey", "string")
     if configExpect("name", "string") then
         bAssert(ctx.utils.endsWith(ctx.config.name or "", ".kst"), "Remove \'.kst\' from the name.")
     end
