@@ -148,7 +148,10 @@ function kristlyEvent(data)
 end
 
 function handleTransaction(transaction)
-  logger:debug("Handle Transaction")
+  logger:debug("Handle Transaction... Reloading storage to be sure")
+  os.queueEvent("kstUpdateProducts")
+  os.pullEvent("kristify:storageRefreshed")
+  logger:debug("Storage refreshed!")
   local product = utils.getProduct(products, transaction.sent_metaname)
 
   if product == false or product == nil then
