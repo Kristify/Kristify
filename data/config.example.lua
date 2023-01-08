@@ -20,6 +20,9 @@ return {
   -- The scale you want on your monitor. 1 is normal size, 0.5 is half the sise. Defaults to 0.5.
   monScale = 0.5,
 
+  -- If the storage should be refreshed once there comes in a purchase. This will slow down your shop. Only use this if you are inserting items into the storage without reloading manually.
+  refreshCacheBeforePurchase = false,
+
   -- A tablearray of storage units. This is parsed by AbstractInvLib. Required.
   storage = {
     ""
