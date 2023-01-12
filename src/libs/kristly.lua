@@ -409,6 +409,7 @@ function kristlyWS:start()
         type = "KRISTLY-ERROR",
         error = "DISCONNECTED. " .. returned
       })
+      return
     end
 
     if returned == nil then
@@ -416,6 +417,7 @@ function kristlyWS:start()
         type = "KRISTLY-ERROR",
         error = "NO-RESPONSE"
       })
+      return
     end
 
     local data = textutils.unserializeJSON(returned)
