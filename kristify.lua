@@ -192,6 +192,13 @@ elseif tArgs[1] == "--storage" or tArgs[1] == "-s" then
 elseif tArgs[1] == "--exit" or tArgs[1] == "-e" then
   os.queueEvent("kristify:exit")
 
+elseif tArgs[1] == "--nbt" or tArgs[1] == "-n" then
+  print("NBT Hash of item #1: ")
+
+  local data = turtle.getItemDetail(1, true)
+  assert(data, "No data gotten from slot one")
+
+  print(data.nbt or "No NBT data. Leave the field to `nil` or don't define it.")
 elseif tArgs[1] == "--help" or tArgs[1] == "-h" then
   print("Usage: "..(tArgs[0] or "kristify.lua").." [flag:]")
   print("-u","--update","Updates Kristify.")
@@ -199,4 +206,5 @@ elseif tArgs[1] == "--help" or tArgs[1] == "-h" then
   print("-t [name]","--theme","Shows or installs a given theme.")
   print("-s", "--storage", "Updates the storage.")
   print("-e", "--exit", "Stops the shop")
+  print("-n", "--nbt", "Gets the NBT hash of the item in slot one")
 end
