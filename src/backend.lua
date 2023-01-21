@@ -182,7 +182,7 @@ function handleTransaction(transaction)
   if amount > itemsInStock then
     logger:info("Not enough in stock. Refunding")
     logger:debug("Stock for " .. product.displayName .. " was " .. itemsInStock .. ", requested " .. amount)
-    refund(config.pkey, transaction, amount * product.price, config.messages.notEnoughStock)
+    refund(config.pkey, transaction, transaction.value, config.messages.notEnoughStock)
     return
   end
 
