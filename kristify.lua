@@ -19,7 +19,7 @@ if gitAPI then
       term.setTextColor(colors.orange)
       term.write("Update available for Kristify! ")
       term.setTextColor(colors.lightGray)
-      print(newV.."->"..version)
+      print(version.." (current) --> ".. newV .. " (latest)")
       term.setTextColor(colors.white)
       print("Run \'kristify.lua -u\' or --update")
       sleep(0.8)
