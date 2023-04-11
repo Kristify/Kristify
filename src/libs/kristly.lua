@@ -155,7 +155,7 @@ end
 function kristly.authenticate(privatekey)
   expect(1, privatekey, "string")
 
-  return basicJSONPOST("https://krist.dev/login", "privatekey=" .. privatekey)
+  return basicJSONPOST("login", "privatekey=" .. privatekey)
 end
 
 ---Gets information about the krist server (MOTD)
