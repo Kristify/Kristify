@@ -128,8 +128,7 @@ function kristlyEvent(data)
       end
     end
   elseif data.type == "KRISTLY-ERROR" then
-    logger:error("Received kristly error: " .. data.error)
-    return
+    error("Received kristly error: " .. data.error)
   else
     logger:debug("Ignoring packet: " .. data.type)
   end
