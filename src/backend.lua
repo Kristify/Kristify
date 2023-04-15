@@ -13,18 +13,6 @@ local pulseID = -1
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
 
-if string.find(_HOST, "CraftOS-PC", 1, true) then
-  logger:error("CraftOS-PC detected. There is a bug in CraftOS-PC that makes kristify not work. This has been reported to the author.")
-  return
-end
-
-if config == nil then
-  logger:error("Config not found! Check documentation for more info.")
-  return
-end
-
-logger:debug("CraftOS-PC not detected")
-
 local speaker = speakerLib:new({
   config = config
 })
