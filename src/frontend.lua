@@ -171,7 +171,7 @@ end
 local titleEnd = base:getDeepObject("_title_end")
 if titleEnd then
     local _, nY = titleEnd:getPosition()
-    titleEnd:setPosition(nX + (math.floor(nW)*factor*1.5), nY)
+    titleEnd:setPosition(nX+(math.floor(nW*factor)), nY)
 end
 
 local watermark = base:getDeepObject("_watermark")

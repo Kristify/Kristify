@@ -175,15 +175,18 @@ end
 print("Starting initiating process.")
 
 local function xpcaller(toRun)
+  local msg = false
   xpcall(toRun, function(err)
+    msg = err
     ctx.logger:error(err)
     ctx.logger:warn("Error detected. Press a key to exit.")
     sleep(0.5)
-    os.pullEvent("key")
   end)
+  return msg
 end
 
-xpcaller(init)
+local err = xpcaller(init)
+if err then os.pullEvent("key") end
 
 local function runFile(path)
   local script, err = loadfile(path, "t", _ENV)
@@ -196,7 +199,7 @@ local function runFile(path)
 end
 
 
-xpcaller(function()
+err = xpcaller(function()
   parallel.waitForAny(
     function()
       runFile(fs.combine(sourcePath, "backend.lua"))
@@ -207,7 +210,20 @@ xpcaller(function()
   )
 end)
 
-ctx.logger:error("A process exitted.")
-ctx.logger:warn("Error detected. Press a key to exit.")
+-- Clear monitor so nobody donates money (and print error if one appeared)
+local mon = peripheral.wrap(ctx.config.monSide)
+local width, height = mon.getSize()
+mon.setBackgroundColor(colors.black)
+mon.setTextColor(colors.white)
+mon.clear()
+mon.setTextScale(0.5)
+mon.setCursorPos(math.floor(width/2-(#ctx.config.name+4)/2+1),math.floor(height/2))
+mon.write(ctx.config.name..".kst")
+mon.setCursorPos(math.floor(width/2-7),math.floor(height/2)+1)
+mon.setTextColor(colors.lightGray)
+mon.write("Shop is offline")
+
+ctx.logger:error("A process stopped.")
+if err then ctx.logger:warn("Error detected. Press a key to exit.") end
 sleep(0.5)
 os.pullEvent("key")
