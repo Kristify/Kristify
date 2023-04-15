@@ -526,6 +526,10 @@ if not http then
     :setBackground(colors.green)
     :setForeground(colors.white)
     :onClick(function()
+      settings.define("kristiy.path", {definition="The location of Kristify's installation", type="string", default="kristify"})
+      settings.set("kristify.path", pathToInstall)
+      settings.save()
+
       local script = "shell.run(\"kristify.lua\")"
       local file = "startKristify.lua"
       if checkbox:getValue() then
