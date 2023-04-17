@@ -195,7 +195,9 @@ local function runFile(path)
     error("Could not load script. " + err)
   end
 
-  pcall(script, ctx)
+  -- xpcall(script, function(err) error(err) end, ctx)
+  -- pcall(script, ctx)
+  script(ctx)
 end
 
 
@@ -203,27 +205,29 @@ err = xpcaller(function()
   parallel.waitForAny(
     function()
       runFile(fs.combine(sourcePath, "backend.lua"))
+      ctx.logger:warn("Backend exited")
     end,
     function()
       runFile(fs.combine(sourcePath, "frontend.lua"))
+      ctx.logger:warn("Frontend exited")
     end
   )
 end)
 
--- Clear monitor so nobody donates money (and print error if one appeared)
+-- Clear monitor so nobody donates money
 local mon = peripheral.wrap(ctx.config.monSide)
 local width, height = mon.getSize()
 mon.setBackgroundColor(colors.black)
 mon.setTextColor(colors.white)
 mon.clear()
 mon.setTextScale(0.5)
-mon.setCursorPos(math.floor(width/2-(#ctx.config.name+4)/2+1),math.floor(height/2))
-mon.write(ctx.config.name..".kst")
-mon.setCursorPos(math.floor(width/2-7),math.floor(height/2)+1)
+mon.setCursorPos(math.floor(width / 2 - (#ctx.config.name + 4) / 2 + 1), math.floor(height / 2))
+mon.write(ctx.config.name .. ".kst")
+mon.setCursorPos(math.floor(width / 2 - 7), math.floor(height / 2) + 1)
 mon.setTextColor(colors.lightGray)
 mon.write("Shop is offline")
 
-ctx.logger:error("A process stopped.")
+ctx.logger:error("A process exited.")
 if err then ctx.logger:warn("Error detected. Press a key to exit.") end
 sleep(0.5)
 os.pullEvent("key")
