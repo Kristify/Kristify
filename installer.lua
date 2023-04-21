@@ -202,14 +202,10 @@ if not http then
         return false
       end
       
-      local sData = response.readAll()
-      response.close()
-  
-       sData  = sData:gsub("local installation = \"kristify\"", "local installation = \""..pathToInstall.."\"")
-        
       local file = fs.open("/kristify.lua", 'w')
-      file.write(sData)
+      file.write(response.readAll())
       file.close()
+      response.close()
    
     for _=1,3 do
       status:addLine("")
@@ -526,9 +522,13 @@ if not http then
     :setBackground(colors.green)
     :setForeground(colors.white)
     :onClick(function()
+      settings.define("kristiy.path", {definition="The location of Kristify's installation", type="string", default="kristify"})
+      settings.set("kristify.path", pathToInstall)
+      settings.save()
+
       local script = "shell.run(\"kristify.lua\")"
-      local file = "startKristify.lua"
       if checkbox:getValue() then
+        local file
         if fs.exists("/startup.lua") then
           file = fs.open("/startup.lua",'a')
         else

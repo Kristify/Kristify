@@ -1,7 +1,12 @@
+-- Copyright © 2022-2023 Kristify
+-- MIT License
+-- WARNING: Has Bad Code TM
+
 local expect = require "cc.expect".expect
 
 local kristly = {}
 local kristlyWS = { ws = nil, id = 0 }
+local syncNode = settings.get("kristly.node") or "https://krist.dev/" -- ~~Secret~~ setting to change node
 
 --#region Utilities
 
@@ -14,7 +19,7 @@ local function basicJSONPOST(endpoint, body)
   expect(1, endpoint, "string")
   expect(2, body, "string")
 
-  return textutils.unserializeJSON(http.post("https://krist.dev/" .. endpoint, body).readAll())
+  return textutils.unserializeJSON(http.post(syncNode .. endpoint, body).readAll())
 end
 
 ---A basic GET function to the krist api.
@@ -24,7 +29,7 @@ end
 local function basicGET(endpoint)
   expect(1, endpoint, "string")
 
-  return textutils.unserializeJSON(http.get("https://krist.dev/" .. endpoint).readAll())
+  return textutils.unserializeJSON(http.get(syncNode .. endpoint).readAll())
 end
 
 ---Sends a simple websocket message to the krist server
@@ -155,7 +160,7 @@ end
 function kristly.authenticate(privatekey)
   expect(1, privatekey, "string")
 
-  return basicJSONPOST("https://krist.dev/login", "privatekey=" .. privatekey)
+  return basicJSONPOST("login", "privatekey=" .. privatekey)
 end
 
 ---Gets information about the krist server (MOTD)

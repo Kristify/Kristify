@@ -14,19 +14,17 @@ local function smartLoadLayout(frame, path)
         file.close()
         local func,err = load(data, path, "bt", _ENV)
         if not func then
-            ctx.logger:error("Could not load layout \'data/"..path..".lua\'! ("..err..")")
-            return
+            error("Could not load layout \'data/"..path..".lua\'! ("..err..")")
         end
         local success,obj = pcall(func,ctx,frame)
         if not success then
-            ctx.logger:error(obj)
-            return
+            error(obj)
         end
         frame:addObject(obj)
     elseif fs.exists(pathXML) then
         frame:addLayout(pathXML)
     else
-        ctx.logger:error("Layout \'data/"..path.."\' does not exist!")
+        error("Layout \'data/"..path.."\' does not exist!")
     end
     return frame
 end
@@ -171,7 +169,7 @@ end
 local titleEnd = base:getDeepObject("_title_end")
 if titleEnd then
     local _, nY = titleEnd:getPosition()
-    titleEnd:setPosition(nX + (math.floor(nW)*factor*1.5), nY)
+    titleEnd:setPosition(nX+(math.floor(nW*factor)), nY)
 end
 
 local watermark = base:getDeepObject("_watermark")

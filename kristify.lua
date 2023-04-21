@@ -1,4 +1,4 @@
-local installation = "kristify"
+local installation = settings.get("kristify.path") or "kristify"
 local owner,repo = "kristify","themes"
 local tArgs = {...}
 
