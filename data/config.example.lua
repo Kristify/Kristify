@@ -76,4 +76,17 @@ return {
     click = "minecraft:block.wooden_button.click_on",
     volume = 0.6
   }
+
+  -- Settings for ShopSync broadcasts (https://p.sc3.io/7Ae4KxgzAM)
+  shopSync = {
+    enabled = true,
+    owner = "",
+    multiShop = nil,
+    location = {
+      broadcastLocation = true,
+      coordinates = { 0, 0, 0 },
+      description = "",
+      dimension = "overworld"
+    }
+  }
 }
