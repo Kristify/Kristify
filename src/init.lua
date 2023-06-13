@@ -220,6 +220,10 @@ if continue then
       function()
         runFile(fs.combine(sourcePath, "frontend.lua"))
         ctx.logger:warn("Frontend exited")
+      end,
+      function()
+        runFile(fs.combine(sourcePath, "shopsync.lua"))
+        ctx.logger:warn("ShopSync exited")
       end
     )
     error("Something exited.")
