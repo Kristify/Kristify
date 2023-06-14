@@ -12,6 +12,11 @@ local function init()
     data = dataPath
   }
 
+  -- Version
+  local verFile = fs.open(fs.combine(rootPath, "version.txt"), "r")
+  ctx.version = verFile.readAll()
+  verFile.close()
+
   -- Logger
   ctx.logger = require("logger"):new({
     debugging = settings.get("kristify.debug"),
@@ -212,20 +217,34 @@ end
 
 if continue then
   err = xpcaller(function()
-    parallel.waitForAny(
-      function()
-        runFile(fs.combine(sourcePath, "backend.lua"))
-        ctx.logger:warn("Backend exited")
-      end,
-      function()
-        runFile(fs.combine(sourcePath, "frontend.lua"))
-        ctx.logger:warn("Frontend exited")
-      end,
-      function()
-        runFile(fs.combine(sourcePath, "shopsync.lua"))
-        ctx.logger:warn("ShopSync exited")
-      end
+    if ctx.shopSync.enabled then
+      parallel.waitForAny(
+        function()
+          runFile(fs.combine(sourcePath, "backend.lua"))
+          ctx.logger:warn("Backend exited")
+        end,
+        function()
+          runFile(fs.combine(sourcePath, "frontend.lua"))
+          ctx.logger:warn("Frontend exited")
+        end,
+        function()
+          runFile(fs.combine(sourcePath, "shopsync.lua"))
+          ctx.logger:warn("ShopSync exited")
+        end
+      )
+    else
+      parallel.waitForAny(
+        function()
+          runFile(fs.combine(sourcePath, "backend.lua"))
+          ctx.logger:warn("Backend exited")
+        end,
+        function()
+          runFile(fs.combine(sourcePath, "frontend.lua"))
+          ctx.logger:warn("Frontend exited")
+        end
+      )
     )
+    end
     error("Something exited.")
   end)
 end
