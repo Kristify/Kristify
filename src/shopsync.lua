@@ -54,10 +54,26 @@ txModem.open(BROADCAST_CHANNEL)
 
 if (ctx.config.shopSync.enabled) then
     while true do 
-        -- TODO: Reset & populate items list
+        txMsg.items = {}
+        for i, product in ipairs(ctx.products) do
+            table.insert(txMsg.items, {
+                prices = {
+                    value = product.price,
+                    currency = "KST",
+                    address = product.metaname .. "@" .. ctx.config.name
+                },
+                item = {
+                    name = product.id,
+                    nbt = product.nbt,
+                    displayName = product.displayName
+                },
+                stock = ctx.storage.getCount(product.id, product.nbt),
+                madeOnDemand = false,
+                requiresInteraction = false
+            })
+        end
 
         txModem.transmit(BROADCAST_CHANNEL, BROADCAST_CHANNEL, txMsg)
-        print(textutils.serialise(txMsg))
         sleep(BROADCAST_INTERVAL_SEC)
     end
 else
