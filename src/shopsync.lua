@@ -1,3 +1,4 @@
+local installation = settings.get("kristify.path") or "kristify"
 local ctx = ({ ... })[1]
 
 local BROADCAST_CHANNEL = 9773
@@ -9,7 +10,7 @@ local txMsg = {
     info = {
         name = ctx.config.name,
         description = ctx.config.tagline,
-        multiShop = cfg.config.shopsync.multiShop,
+        multiShop = ctx.config.shopSync.multiShop,
         software = {
             name = "Kristify"
         },
@@ -18,27 +19,27 @@ local txMsg = {
     items = {}
 }
 
-local verFile = fs.open("version.txt", "r")
+local verFile = fs.open(fs.combine(installation, "src", "version.txt"), "r")
 txMsg.info.software.version = verFile.readAll()
 verFile.close()
 
-if (cfg.config.shopsync.modem == nil) or (cfg.config.shopsync.modem == "") then
+if (ctx.config.shopSync.modem == nil) or (ctx.config.shopSync.modem == "") then
     txModem = peripheral.find("modem", function(name, modem)
         return modem.isWireless()
     end)
 else
-    txModem = peripheral.wrap(cfg.config.shopsync.modem)
+    txModem = peripheral.wrap(ctx.config.shopSync.modem)
 end
 
-if not ((cfg.config.shopsync.owner == nil) or (cfg.config.shopsync.owner == "")) then
-    txMsg.info.owner = cfg.config.shopsync.owner
+if not ((ctx.config.shopSync.owner == nil) or (ctx.config.shopSync.owner == "")) then
+    txMsg.info.owner = ctx.config.shopSync.owner
 end
 
-if (cfg.config.shopsync.location.broadcastLocation == true) then
-    txMsg.info.location = cfg.config.shopsync.location
+if (ctx.config.shopSync.location.broadcastLocation == true) then
+    txMsg.info.location = ctx.config.shopSync.location
     txMsg.info.location.broadcastLocation = nil
 
-    if (txMsg.info.location.coordinates == { 0, 0, 0 }) then
+    if (txMsg.info.location.coordinates[2] == 0) then
         local gps_x, gps_y, gps_z = gps.locate()
         if (gps_x ~= nil) then
             txMsg.info.location.coordinates = { gps_x, gps_y, gps_z }
