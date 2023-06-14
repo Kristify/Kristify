@@ -1,5 +1,6 @@
 local installation = settings.get("kristify.path") or "kristify"
 local ctx = ({ ... })[1]
+local shopSync = ctx.config.shopSync
 
 local BROADCAST_CHANNEL = 9773
 local BROADCAST_INTERVAL_SEC = 30
@@ -10,7 +11,7 @@ local txMsg = {
     info = {
         name = ctx.config.name,
         description = ctx.config.tagline,
-        multiShop = ctx.config.shopSync.multiShop,
+        multiShop = shopSync.multiShop,
         software = {
             name = "Kristify"
         },
@@ -23,25 +24,25 @@ local verFile = fs.open(fs.combine(installation, "src", "version.txt"), "r")
 txMsg.info.software.version = verFile.readAll()
 verFile.close()
 
-if (ctx.config.shopSync.modem == nil) or (ctx.config.shopSync.modem == "") then
+if shopSync.modem == nil or shopSync.modem == "" then
     txModem = peripheral.find("modem", function(name, modem)
         return modem.isWireless()
     end)
 else
-    txModem = peripheral.wrap(ctx.config.shopSync.modem)
+    txModem = peripheral.wrap(shopSync.modem)
 end
 
-if not ((ctx.config.shopSync.owner == nil) or (ctx.config.shopSync.owner == "")) then
-    txMsg.info.owner = ctx.config.shopSync.owner
+if not shopSync.owner == nil or shopSync.owner == "" then
+    txMsg.info.owner = shopSync.owner
 end
 
-if (ctx.config.shopSync.location.broadcastLocation == true) then
-    txMsg.info.location = ctx.config.shopSync.location
+if shopSync.location.broadcastLocation == true then
+    txMsg.info.location = shopSync.location
     txMsg.info.location.broadcastLocation = nil
 
-    if (txMsg.info.location.coordinates[2] == 0) then
+    if txMsg.info.location.coordinates[2] == 0 then
         local gps_x, gps_y, gps_z = gps.locate()
-        if (gps_x ~= nil) then
+        if gps_x ~= nil then
             txMsg.info.location.coordinates = { gps_x, gps_y, gps_z }
         else
             txMsg.info.location.coordinates = nil
@@ -52,7 +53,7 @@ end
 -- Set up modem
 txModem.open(BROADCAST_CHANNEL)
 
-if (ctx.config.shopSync.enabled) then
+if shopSync.enabled then
     while true do 
         txMsg.items = {}
         for i, product in ipairs(ctx.products) do
