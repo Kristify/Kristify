@@ -59,7 +59,7 @@ if not http then
   local nRequired = 0
   
   local tURLs = {}
-  tURLs.owner = "sc-sdc" -- TODO: Revert this to Kristify before submitting and/or merging PR
+  tURLs.owner = "Kristify"
   tURLs.repo = "kristify"
   tURLs.branch = "main"
   tURLs.tree = "https://api.github.com/repos/"..tURLs.owner.."/"..tURLs.repo.."/contents/?ref="..tURLs.branch
