@@ -75,7 +75,7 @@ return {
     error = "minecraft:block.anvil.land",
     click = "minecraft:block.wooden_button.click_on",
     volume = 0.6
-  }
+  },
 
   -- Settings for ShopSync broadcasts (https://p.sc3.io/7Ae4KxgzAM)
   shopSync = {
