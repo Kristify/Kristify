@@ -51,8 +51,8 @@ if shopSync.location.broadcastLocation then
     end
 end
 
--- Refresh chest index to prevent initially reporting no stock
-ctx.storage.refreshStorage(true)
+-- Wait for chests to be indexed
+os.pullEvent("kristify:storageRefreshed")
 
 -- Continously broadcast ShopSync message
 while true do
