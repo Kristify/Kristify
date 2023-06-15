@@ -217,7 +217,7 @@ end
 
 if continue then
   err = xpcaller(function()
-    if ctx.config.shopSync.enabled then
+    if ctx.config.shopSync and ctx.config.shopSync.enabled then
       parallel.waitForAny(
         function()
           runFile(fs.combine(sourcePath, "backend.lua"))
