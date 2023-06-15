@@ -20,7 +20,7 @@ txModem.open(BROADCAST_CHANNEL)
 local txMsg = {
     type = "ShopSync",
     info = {
-        name = ctx.config.name,
+        name = ctx.config.name .. ".kst",
         description = ctx.config.tagline,
         multiShop = shopSync.multiShop,
         software = {
@@ -63,7 +63,7 @@ while true do
             prices = {
                 value = product.price,
                 currency = "KST",
-                address = product.metaname .. "@" .. ctx.config.name
+                address = product.metaname .. "@" .. ctx.config.name .. ".kst"
             },
             item = {
                 name = product.id,
