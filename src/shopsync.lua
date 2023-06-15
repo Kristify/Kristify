@@ -51,8 +51,11 @@ if shopSync.location.broadcastLocation then
     end
 end
 
+-- Refresh chest index to prevent initially reporting no stock
+ctx.storage.refreshStorage(true)
+
 -- Continously broadcast ShopSync message
-while true do 
+while true do
     -- Refresh products list
     txMsg.items = {}
     for i, product in ipairs(ctx.products) do
