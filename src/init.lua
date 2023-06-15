@@ -13,7 +13,7 @@ local function init()
   }
 
   -- Version
-  local verFile = fs.open(fs.combine(rootPath, "version.txt"), "r")
+  local verFile = fs.open(fs.combine(rootPath, "src", "version.txt"), "r")
   ctx.version = verFile.readAll()
   verFile.close()
 
@@ -217,7 +217,7 @@ end
 
 if continue then
   err = xpcaller(function()
-    if ctx.shopSync.enabled then
+    if ctx.config.shopSync.enabled then
       parallel.waitForAny(
         function()
           runFile(fs.combine(sourcePath, "backend.lua"))
@@ -243,7 +243,6 @@ if continue then
           ctx.logger:warn("Frontend exited")
         end
       )
-    )
     end
     error("Something exited.")
   end)

@@ -104,7 +104,7 @@ end
 ---Checks if a value is "nullish" or basically nil.
 ---@param value variable The value to check
 function utils.isNullish(value)
-  return value == nil or value == 0 or value = ""
+  return value == nil or value == 0 or value == ""
 end
 
 return utils
