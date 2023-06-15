@@ -75,5 +75,31 @@ return {
     error = "minecraft:block.anvil.land",
     click = "minecraft:block.wooden_button.click_on",
     volume = 0.6
+  },
+
+  -- Settings for ShopSync broadcasts (https://p.sc3.io/7Ae4KxgzAM)
+  shopSync = {
+    -- Whether ShopSync data should be broadcast. Required.
+    enabled = true,
+
+    -- Modem to send ShopSync data over. Tries to locate an ender or wireless modem if not specified.
+    modem = "",
+
+    -- Username of the shop owner. 
+    owner = "",
+
+    -- If multiple shops are ran off of this computer, this should be a unique integer starting at 1.
+    multiShop = nil,
+
+    -- Location of the shop.
+    location = {
+      -- Whether or not shop location should be broadcast. Required.
+      broadcastLocation = true,
+
+      -- Location of the shop. If coordinates are left at 0, 0 GPS may be used to determine the location.
+      coordinates = { 0, 0, 0 }, -- x, y, z
+      description = "",
+      dimension = "overworld"
+    }
   }
 }
