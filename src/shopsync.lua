@@ -61,9 +61,11 @@ while true do
     for i, product in ipairs(ctx.products) do
         table.insert(txMsg.items, {
             prices = {
-                value = product.price,
-                currency = "KST",
-                address = product.metaname .. "@" .. ctx.config.name .. ".kst"
+                {
+                    value = product.price,
+                    currency = "KST",
+                    address = product.metaname .. "@" .. ctx.config.name .. ".kst"
+                }
             },
             item = {
                 name = product.id,
