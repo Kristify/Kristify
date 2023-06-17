@@ -1,7 +1,7 @@
 # Kristify
 
 ![generic docs](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/documentation/generic_vector.svg)
-![risugamis-modloader](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/compact/unsupported/risugamis-modloader_vector.svg)
+![risugamis-modloader](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/unsupported/risugamis-modloader_vector.svg)
 
 A piece of software that lets you create **highly customizable** [Krist](https://krist.dev/) shops in modern versions of [ComputerCraft](https://modrinth.com/mod/cc-tweaked)!
 
