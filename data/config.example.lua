@@ -8,9 +8,6 @@ return {
   -- The Krist name you want to use for the shop. The need for this will be removed later on. Required.
   name = "",
 
-  -- The networkID of your turtle. To get this click the modem your turtle is connected to.
-  self = "",
-
   -- The tagline for your shop! This is a string, and is optional. Your theme is able to get this field.
   tagline = "",
 
@@ -85,7 +82,7 @@ return {
     -- Modem to send ShopSync data over. Tries to locate an ender or wireless modem if not specified.
     modem = "",
 
-    -- Username of the shop owner. 
+    -- Username of the shop owner.
     owner = "",
 
     -- If multiple shops are ran off of this computer, this should be a unique integer starting at 1.

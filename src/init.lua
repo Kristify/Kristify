@@ -147,10 +147,6 @@ local function init()
   local modem = peripheral.find("modem")
   if not modem then
     error("Kristify is not connected to a network! (aka. wired modem)")
-  elseif type(ctx.config.self) == "string" and modem.getNameLocal() ~= (ctx.config.self or "") then
-    error("Given turtle in config does not exist!")
-  else
-    configExpect("self", "string")
   end
 
   if configExpect("storage", "table") then

@@ -9,6 +9,7 @@ local webhooks = ctx.webhooks
 local speakerLib = ctx.speakerLib
 
 local pulseID = -1
+local turtleID = peripheral.find("modem").getNameLocal()
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
@@ -190,12 +191,11 @@ function handleTransaction(transaction)
     logger:debug("Turn: " .. turn .. ". Turns needed: " .. turns)
     if turns == turn then
       logger:debug("Last turn.")
-      logger:debug("Arguments passed: " .. config.self, " | ", product.id, " | ", tostring(lastTurn))
-      storage.pushItems(config.self, product.id, lastTurn, nil, product.nbt, { optimal = false })
+      logger:debug("Arguments passed: " .. turtleID, " | ", product.id, " | ", tostring(lastTurn))
+      storage.pushItems(turtleID, product.id, lastTurn, nil, product.nbt, { optimal = false })
     else
       logger:debug("Not last turn")
-      storage.pushItems(config.self, product.id, stackSize * 16, nil, product.nbt, { optimal = false })
-
+      storage.pushItems(turtleID, product.id, stackSize * 16, nil, product.nbt, { optimal = false })
     end
     for i = 1, 16 do
       turtle.select(i)
@@ -220,7 +220,6 @@ function handleTransaction(transaction)
           transaction.id,
           transaction.to
         )
-
       elseif webhook.type == "googleChat" then
         webhooks.googleChat(webhook.URL, message)
       end
