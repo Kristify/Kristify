@@ -1,4 +1,3 @@
-local installation = settings.get("kristify.path") or "kristify"
 local ctx = ({ ... })[1]
 local shopSync = ctx.config.shopSync
 
