@@ -9,7 +9,7 @@ local webhooks = ctx.webhooks
 local speakerLib = ctx.speakerLib
 
 local pulseID = -1
-local turtleID = peripheral.find("modem").getNameLocal()
+local turtleID = peripheral.find("peripheral_hub").getNameLocal()
 
 logger:info("Starting Kristify! Thanks for choosing Kristify. <3")
 logger:debug("Debugging mode is enabled!")
