@@ -1,7 +1,6 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[Feat]: "
 labels: enhancement
 assignees: ''
 
@@ -14,7 +13,7 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 A clear and concise description of what you want to happen.
 
 **Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+Have you thought of any alternatives to the solution outlined above?
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
