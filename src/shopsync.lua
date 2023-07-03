@@ -51,11 +51,8 @@ if shopSync.location.broadcastLocation then
     end
 end
 
--- Wait for chests to be indexed
-os.pullEvent("kristify:storageRefreshed")
-
--- Continously broadcast ShopSync message
-while true do
+-- Function to broadcast message
+function broadcastShopSync() 
     -- Refresh products list
     txMsg.items = {}
     for i, product in ipairs(ctx.products) do
@@ -81,5 +78,21 @@ while true do
 
     -- Transmit & wait
     txModem.transmit(BROADCAST_CHANNEL, os.getComputerID() % 65536, txMsg)
-    sleep(BROADCAST_INTERVAL_SEC)
+end
+
+-- Wait for chests to be indexed
+os.pullEvent("kristify:storageRefreshed")
+
+-- Wait 15-30s before inital broadcast
+math.randomseed(os.epoch())
+os.startTimer(15 + (math.random() * 15))
+os.pullEvent("timer")
+
+-- Inital ShopSync broadcast ('Situation 1')
+broadcastShopSync() 
+
+-- Broadcast after each purchase (or in this case, storage refresh) ('Situation 2')
+while true do
+    os.pullEvent("kristify:storageRefreshed")
+    broadcastShopSync()
 end
