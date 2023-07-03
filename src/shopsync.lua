@@ -80,6 +80,6 @@ while true do
     end
 
     -- Transmit & wait
-    txModem.transmit(BROADCAST_CHANNEL, os.getComputerID(), txMsg)
+    txModem.transmit(BROADCAST_CHANNEL, os.getComputerID() % 65536, txMsg)
     sleep(BROADCAST_INTERVAL_SEC)
 end
