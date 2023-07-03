@@ -21,6 +21,7 @@ local txMsg = {
     info = {
         name = ctx.config.name .. ".kst",
         description = ctx.config.tagline,
+        computerID = os.getComputerID(),
         multiShop = shopSync.multiShop,
         software = {
             name = "Kristify",
@@ -71,6 +72,7 @@ while true do
                 nbt = product.nbt,
                 displayName = product.displayName
             },
+            dynamicPrice = false,
             stock = ctx.storage.getCount(product.id, product.nbt),
             madeOnDemand = false,
             requiresInteraction = false
