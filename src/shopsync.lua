@@ -90,9 +90,19 @@ os.pullEvent("timer")
 
 -- Inital ShopSync broadcast ('Situation 1')
 broadcastShopSync() 
+lastBroadcastAt = os.clock()
 
 -- Broadcast after each purchase (or in this case, storage refresh) ('Situation 2')
 while true do
+    -- Wait for the chests to be refreshed (this usually happens after a purchase)
     os.pullEvent("kristify:storageRefreshed")
+
+    -- Check the time since the last purchase - if less than 30s, wait until it has been 30s
+    if not (lastBroadcastAt + 30 <= os.clock()) then
+        sleep(30 - (os.clock() - lastBroadcastAt))
+    end
+
+    -- Broadcast the updated shop info
     broadcastShopSync()
+    lastBroadcastAt = os.clock()
 end
