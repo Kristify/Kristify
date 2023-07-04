@@ -85,8 +85,7 @@ os.pullEvent("kristify:storageRefreshed")
 
 -- Wait 15-30s before inital broadcast
 math.randomseed(os.epoch())
-os.startTimer(15 + (math.random() * 15))
-os.pullEvent("timer")
+sleep(15 + (math.random() * 15))
 
 -- Inital ShopSync broadcast ('Situation 1')
 broadcastShopSync() 
